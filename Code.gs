@@ -1,490 +1,212 @@
-/**
- * ============================================================
- * FIXZY BACKEND
- * Google Apps Script + Google Spreadsheet
- * ============================================================
- * Mempertahankan struktur kolom lama.
- * Kolom tambahan akan dibuat di sebelah kanan.
- */
+/** FIXZY APPS SCRIPT BACKEND **/
+
+const SHEETS = {
+  Produk: [
+    'Kode Produk','Nama Produk','Kategori','Merek','Supplier',
+    'Stok','Stok Minimum','Modal Satuan','Harga Jual'
+  ],
+  Servis: [
+    'ID Servis','Tanggal','Nama Pelanggan','WhatsApp','Model HP',
+    'IMEI','Keluhan','Biaya Jasa','Teknisi','Karyawan ID',
+    'Catatan Internal','Sparepart JSON','Total Tagihan','Dibayar',
+    'Sisa Piutang','Status'
+  ],
+  Penjualan: [
+    'ID Penjualan','Tanggal','Nama Pelanggan','WhatsApp',
+    'Karyawan ID','Items JSON','Diskon','Total','Dibayar',
+    'Sisa Piutang','Metode'
+  ],
+  Pengeluaran: [
+    'ID Pengeluaran','Tanggal','Kategori','Nominal',
+    'Metode','Supplier','Karyawan ID','Keterangan'
+  ],
+  Karyawan: [
+    'ID','Nama','Telepon','Jabatan','Upah Harian','Status','Dibuat'
+  ],
+  Absensi: [
+    'ID','Tanggal','Karyawan ID','Nama','Status','Catatan'
+  ],
+  Kasbon: [
+    'ID','Tanggal','Karyawan ID','Nama','Jenis',
+    'Nominal','Keterangan'
+  ],
+  Pengaturan: ['Kunci','Nilai']
+};
 
 const FIXZY_SPREADSHEET_ID =
   '1Dx5wRs39KLFaUStd9NynKJX7j80Zswj66P_dkD_N_Ao';
 
-const FIXZY_SHEET_HEADERS = {
-  Produk: [
-    'Kode Produk',
-    'Nama Produk',
-    'Kategori',
-    'Merek',
-    'Supplier',
-    'Stok',
-    'Stok Minimum',
-    'Modal Satuan',
-    'Harga Jual'
-  ],
 
-  Servis: [
-    'ID Servis',
-    'Tanggal',
-    'Nama Pelanggan',
-    'WhatsApp',
-    'Model HP',
-    'IMEI',
-    'Keluhan',
-    'Biaya Jasa',
-    'Teknisi',
-    'Karyawan ID',
-    'Catatan Internal',
-    'Sparepart JSON',
-    'Total Tagihan',
-    'Dibayar',
-    'Sisa Piutang',
-    'Status',
-    'Jenis Kunci',
-    'PIN/Pola',
-    'Biaya Risiko',
-    'Riwayat Status',
-    'Status Pengerjaan'
-  ],
-
-  Penjualan: [
-    'ID Penjualan',
-    'Tanggal',
-    'Nama Pelanggan',
-    'WhatsApp',
-    'Karyawan ID',
-    'Items JSON',
-    'Diskon',
-    'Total',
-    'Dibayar',
-    'Sisa Piutang',
-    'Metode'
-  ],
-
-  Pengeluaran: [
-    'ID Pengeluaran',
-    'Tanggal',
-    'Kategori',
-    'Nominal',
-    'Metode',
-    'Supplier',
-    'Karyawan ID',
-    'Keterangan',
-    'Referensi ID'
-  ],
-
-  Karyawan: [
-    'ID',
-    'Nama',
-    'Telepon',
-    'Jabatan',
-    'Upah Harian',
-    'Status',
-    'Dibuat'
-  ],
-
-  Absensi: [
-    'ID',
-    'Tanggal',
-    'Karyawan ID',
-    'Nama',
-    'Status',
-    'Catatan'
-  ],
-
-  Kasbon: [
-    'ID',
-    'Tanggal',
-    'Karyawan ID',
-    'Nama',
-    'Jenis',
-    'Nominal',
-    'Keterangan',
-    'Status'
-  ],
-
-  Pengaturan: [
-    'Kunci',
-    'Nilai'
-  ],
-
-  RiwayatStok: [
-    'ID',
-    'Tanggal',
-    'Kode Produk',
-    'Nama Produk',
-    'Jenis',
-    'Jumlah',
-    'Stok Sebelum',
-    'Stok Sesudah',
-    'Alasan',
-    'Referensi',
-    'Petugas'
-  ],
-
-  BiayaRisiko: [
-    'ID',
-    'Tanggal',
-    'ID Servis',
-    'Karyawan ID',
-    'Nama Karyawan',
-    'Nominal',
-    'Keterangan',
-    'Status'
-  ]
-};
-
-const FIXZY_STATUS_PENGERJAAN = [
-  'Masuk Antrian',
-  'Menunggu Part',
-  'Proses',
-  'Selesai',
-  'Sudah Diambil',
-  'Batal'
-];
-
-
-/* ============================================================
-   UTILITAS DASAR
-   ============================================================ */
-
-function fixzySS() {
+function ss() {
   return SpreadsheetApp.openById(FIXZY_SPREADSHEET_ID);
 }
 
-function fixzyJSON(data) {
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function fixzyID(prefix) {
-  return prefix + '-' +
-    Utilities.getUuid().substring(0, 8).toUpperCase();
-}
-
-function fixzyNum(value) {
-  if (typeof value === 'number') {
-    return isFinite(value) ? value : 0;
-  }
-
-  if (value === null || value === undefined || value === '') {
-    return 0;
-  }
-
-  let s = String(value).trim();
-
-  // Menangani format angka Indonesia, misalnya 1.500 atau 1.500,50.
-  if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) {
-    s = s.replace(/\./g, '').replace(',', '.');
-  } else {
-    s = s.replace(/,/g, '');
-  }
-
-  const n = Number(s);
-  return isFinite(n) ? n : 0;
-}
-
-function fixzyText(value) {
-  return value === null || value === undefined
-    ? ''
-    : String(value).trim();
-}
-
-function fixzyDate(value) {
-  if (value instanceof Date) {
-    return Utilities.formatDate(
-      value,
-      Session.getScriptTimeZone(),
-      'yyyy-MM-dd'
-    );
-  }
-
-  return String(value || '').substring(0, 10);
-}
-
-function fixzyNow() {
-  return new Date();
-}
-
-
-/* ============================================================
-   SHEET DAN HEADER
-   Tidak menghapus kolom/data lama.
-   ============================================================ */
 
 function setupSheets() {
-  const ss = fixzySS();
+  const book = ss();
 
-  Object.keys(FIXZY_SHEET_HEADERS).forEach(function(name) {
-    let sh = ss.getSheetByName(name);
+  Object.keys(SHEETS).forEach(n => {
+    let sh = book.getSheetByName(n);
 
     if (!sh) {
-      sh = ss.insertSheet(name);
+      sh = book.insertSheet(n);
     }
 
     if (sh.getLastRow() === 0) {
-      sh.getRange(
-        1,
-        1,
-        1,
-        FIXZY_SHEET_HEADERS[name].length
-      ).setValues([FIXZY_SHEET_HEADERS[name]]);
-
-      sh.setFrozenRows(1);
-      return;
+      sh.appendRow(SHEETS[n]);
     }
-
-    const lastCol = Math.max(sh.getLastColumn(), 1);
-
-    const existing = sh
-      .getRange(1, 1, 1, lastCol)
-      .getDisplayValues()[0]
-      .map(function(x) {
-        return String(x).trim();
-      });
-
-    FIXZY_SHEET_HEADERS[name].forEach(function(header) {
-      if (existing.indexOf(header) === -1) {
-        const newCol = sh.getLastColumn() + 1;
-        sh.getRange(1, newCol).setValue(header);
-        existing.push(header);
-      }
-    });
-
-    sh.setFrozenRows(1);
   });
 
   return {
     ok: true,
-    message: 'Pemeriksaan sheet selesai. Data lama tidak dihapus.'
+    message: 'Sheet FIXZY siap dibuat/diperiksa.'
   };
 }
 
-function fixzySheet(name) {
-  let sh = fixzySS().getSheetByName(name);
 
-  if (!sh) {
+function sheet(n) {
+  let s = ss().getSheetByName(n);
+
+  if (!s) {
     setupSheets();
-    sh = fixzySS().getSheetByName(name);
+    s = ss().getSheetByName(n);
   }
 
-  if (!sh) {
-    throw new Error('Sheet tidak ditemukan: ' + name);
-  }
-
-  return sh;
-}
-
-function fixzyHeaders(name) {
-  const sh = fixzySheet(name);
-
-  if (sh.getLastColumn() === 0) {
-    return [];
-  }
-
-  return sh.getRange(1, 1, 1, sh.getLastColumn())
-    .getDisplayValues()[0]
-    .map(function(x) {
-      return String(x).trim();
-    });
-}
-
-function fixzyRows(name) {
-  const sh = fixzySheet(name);
-  const values = sh.getDataRange().getValues();
-
-  if (values.length < 2) {
-    return [];
-  }
-
-  const headers = values[0].map(function(x) {
-    return String(x).trim();
-  });
-
-  return values.slice(1)
-    .filter(function(row) {
-      return row.some(function(value) {
-        return value !== '' && value !== null;
-      });
-    })
-    .map(function(row, index) {
-      const obj = {};
-
-      headers.forEach(function(header, i) {
-        if (header) {
-          obj[header] = row[i];
-        }
-      });
-
-      obj._row = index + 2;
-      return obj;
-    });
-}
-
-function fixzyAppend(name, obj) {
-  const sh = fixzySheet(name);
-  const headers = fixzyHeaders(name);
-
-  sh.appendRow(headers.map(function(header) {
-    return obj[header] === undefined ? '' : obj[header];
-  }));
-}
-
-function fixzyFind(name, header, value) {
-  return fixzyRows(name).find(function(row) {
-    return String(row[header]) === String(value);
-  }) || null;
-}
-
-function fixzyUpdate(name, rowNumber, obj) {
-  const sh = fixzySheet(name);
-  const headers = fixzyHeaders(name);
-
-  const current = sh
-    .getRange(rowNumber, 1, 1, headers.length)
-    .getValues()[0];
-
-  const mapped = {};
-
-  headers.forEach(function(header, i) {
-    mapped[header] = current[i];
-  });
-
-  Object.keys(obj).forEach(function(key) {
-    if (headers.indexOf(key) !== -1) {
-      mapped[key] = obj[key];
-    }
-  });
-
-  sh.getRange(rowNumber, 1, 1, headers.length)
-    .setValues([
-      headers.map(function(header) {
-        return mapped[header] === undefined
-          ? ''
-          : mapped[header];
-      })
-    ]);
-}
-
-function fixzyDeleteRows(name, rowNumbers) {
-  const sh = fixzySheet(name);
-
-  // Hapus dari baris terbesar agar nomor baris tidak bergeser.
-  rowNumbers
-    .filter(function(n) {
-      return n > 1;
-    })
-    .sort(function(a, b) {
-      return b - a;
-    })
-    .forEach(function(n) {
-      sh.deleteRow(n);
-    });
+  return s;
 }
 
 
-/* ============================================================
-   WEB APP
-   ============================================================ */
+function rows(n) {
+  const s = sheet(n);
+  const v = s.getDataRange().getValues();
+
+  if (v.length < 2) return [];
+
+  const h = v[0];
+
+  return v.slice(1)
+    .filter(r => r.some(x => x !== '' && x !== null))
+    .map(r => Object.fromEntries(
+      h.map((k, i) => [k, r[i]])
+    ));
+}
+
+
+function append(n, obj) {
+  const s = sheet(n);
+  const h = SHEETS[n];
+
+  s.appendRow(
+    h.map(k => obj[k] === undefined ? '' : obj[k])
+  );
+}
+
+
+function id(prefix) {
+  return prefix + '-' +
+    Utilities.getUuid().slice(0, 8).toUpperCase();
+}
+
+
+function json(o) {
+  return ContentService
+    .createTextOutput(JSON.stringify(o))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+
+/* =========================
+   GET API
+========================= */
 
 function doGet(e) {
   try {
     setupSheets();
 
-    const p = e && e.parameter ? e.parameter : {};
-    const action = String(p.action || 'ping');
+    const action = String(
+      (e.parameter.action || 'ping')
+    ).split('&')[0];
+
+    const q = e.parameter;
 
     switch (action) {
+
       case 'ping':
-        return fixzyJSON({
+        return json({
           ok: true,
-          message: 'FIXZY API aktif'
+          message: 'FIXZY API siap'
         });
 
       case 'stok':
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: fixzyRows('Produk')
+          data: rows('Produk')
         });
 
       case 'servis':
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: fixzyRows('Servis')
+          data: rows('Servis')
         });
 
       case 'penjualan':
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: fixzyRows('Penjualan')
+          data: rows('Penjualan')
         });
 
       case 'pengeluaran':
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: fixzyRows('Pengeluaran')
+          data: rows('Pengeluaran')
         });
 
       case 'karyawan':
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: fixzyRows('Karyawan')
+          data: rows('Karyawan')
         });
 
       case 'pengaturan': {
-        const settings = {};
+        const o = {};
 
-        fixzyRows('Pengaturan').forEach(function(row) {
-          settings[row.Kunci] = row.Nilai;
+        rows('Pengaturan').forEach(x => {
+          o[x.Kunci] = x.Nilai;
         });
 
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: settings
+          data: o
         });
       }
 
       case 'absensi': {
-        const month = p.bulan || Utilities.formatDate(
-          new Date(),
-          Session.getScriptTimeZone(),
-          'yyyy-MM'
-        );
+        const b = q.bulan ||
+          Utilities.formatDate(
+            new Date(),
+            Session.getScriptTimeZone(),
+            'yyyy-MM'
+          );
 
-        const data = fixzyRows('Absensi').filter(function(row) {
-          return fixzyDate(row.Tanggal).substring(0, 7) === month;
-        });
-
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: data
+          data: rows('Absensi')
+            .filter(x =>
+              fmtDate(x.Tanggal).slice(0, 7) === b
+            )
+            .map(x => ({
+              ...x,
+              Tanggal: fmtDate(x.Tanggal)
+            }))
         });
       }
 
-      case 'kasbon':
-        return fixzyJSON({
-          ok: true,
-          data: fixzyRows('Kasbon')
-        });
-
-      case 'riwayatstok':
-        return fixzyJSON({
-          ok: true,
-          data: fixzyRows('RiwayatStok')
-        });
-
-      case 'biayarisiko':
-        return fixzyJSON({
-          ok: true,
-          data: fixzyRows('BiayaRisiko')
-        });
-
       case 'upah':
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: fixzyPayroll(
-            p.bulan || Utilities.formatDate(
+          data: calcPayroll(
+            q.bulan ||
+            Utilities.formatDate(
               new Date(),
               Session.getScriptTimeZone(),
               'yyyy-MM'
@@ -492,28 +214,80 @@ function doGet(e) {
           )
         });
 
-      case 'dashboard':
-        return fixzyJSON({
-          ok: true,
-          data: fixzyDashboard()
-        });
+      case 'dashboard': {
+        const sv = rows('Servis');
+        const pe = rows('Penjualan');
+        const pr = rows('Produk');
 
-      case 'pembayaran':
-        return fixzyJSON({
+        return json({
           ok: true,
-          data: fixzyRows('Servis').filter(function(row) {
-            return fixzyNum(row['Sisa Piutang']) > 0;
-          })
+          ringkasan: {
+            jumlahServis: sv.length,
+
+            totalPiutangServis: sv.reduce(
+              (a, x) => a + num(x['Sisa Piutang']),
+              0
+            ),
+
+            totalPenjualan: pe.reduce(
+              (a, x) => a + num(x.Total),
+              0
+            ),
+
+            stokMenipis: pr.filter(
+              x => num(x.Stok) <= num(x['Stok Minimum'])
+            ).length
+          }
         });
+      }
+
+      /* DAFTAR SERVIS BELUM LUNAS */
+      case 'pembayaran': {
+        const data = rows('Servis').filter(
+          x => num(x['Sisa Piutang']) > 0
+        );
+
+        return json({
+          ok: true,
+          data: data
+        });
+      }
+
+      /* RIWAYAT PEMBAYARAN SERVIS */
+      case 'riwayatpembayaran': {
+        const sh = ss().getSheetByName('PembayaranServis');
+
+        if (!sh || sh.getLastRow() < 2) {
+          return json({
+            ok: true,
+            data: []
+          });
+        }
+
+        const values = sh.getDataRange().getValues();
+        const headers = values[0];
+
+        const data = values.slice(1)
+          .filter(r => r.some(v => v !== ''))
+          .map(r => Object.fromEntries(
+            headers.map((h, i) => [h, r[i]])
+          ));
+
+        return json({
+          ok: true,
+          data: data
+        });
+      }
 
       default:
-        return fixzyJSON({
+        return json({
           ok: false,
           message: 'Action GET tidak dikenal: ' + action
         });
     }
+
   } catch (err) {
-    return fixzyJSON({
+    return json({
       ok: false,
       message: err.message
     });
@@ -521,914 +295,618 @@ function doGet(e) {
 }
 
 
-/* ============================================================
-   POST ROUTER
-   ============================================================ */
+/* =========================
+   POST API
+========================= */
 
 function doPost(e) {
-  const lock = LockService.getScriptLock();
-
   try {
-    lock.waitLock(20000);
     setupSheets();
 
-    const body = e && e.postData
-      ? JSON.parse(e.postData.contents || '{}')
-      : {};
+    const d = JSON.parse(e.postData.contents || '{}');
+    const a = d.action || '';
 
-    const action = String(body.action || '');
+    /* TAMBAH PRODUK */
+    if (a === 'createproduk') {
+      const code = d.kodeProduk || id('PRD');
 
-    switch (action) {
-      case 'createproduk':
-        return fixzyJSON(fixzyCreateProduct(body));
+      append('Produk', {
+        'Kode Produk': code,
+        'Nama Produk': d.namaProduk,
+        'Kategori': d.kategori,
+        'Merek': d.merek,
+        'Supplier': d.supplier,
+        'Stok': num(d.stokAwal),
+        'Stok Minimum': num(d.stokMinimum),
+        'Modal Satuan': num(d.modal),
+        'Harga Jual': num(d.hargaJual)
+      });
 
-      case 'editstok':
-      case 'adjuststock':
-        return fixzyJSON(fixzyAdjustStock(body));
-
-      case 'returstok':
-      case 'returnstock':
-        return fixzyJSON(fixzyReturnStock(body));
-
-      case 'savekaryawan':
-        return fixzyJSON(fixzySaveEmployee(body));
-
-      case 'saveabsensi':
-        return fixzyJSON(fixzySaveAttendance(body));
-
-      case 'savekasbon':
-        return fixzyJSON(fixzySaveKasbon(body));
-
-      case 'savepengaturan':
-        return fixzyJSON(fixzySaveSettings(body));
-
-      case 'createexpense':
-        return fixzyJSON(fixzyCreateExpense(body));
-
-      case 'createservis':
-        return fixzyJSON(fixzyCreateService(body));
-
-      case 'updateservis':
-        return fixzyJSON(fixzyUpdateService(body));
-
-      case 'updateservicestatus':
-      case 'ubahstatusservis':
-        return fixzyJSON(fixzyUpdateServiceStatus(body));
-
-      case 'deleteservis':
-        return fixzyJSON(fixzyDeleteService(body));
-
-      case 'deleteservisbanyak':
-        return fixzyJSON(fixzyDeleteManyServices(body));
-
-      case 'createbiayarisiko':
-      case 'savebiayarisiko':
-        return fixzyJSON(fixzyCreateRiskCost(body));
-
-      case 'createsale':
-        return fixzyJSON(fixzyCreateSale(body));
-
-      default:
-        return fixzyJSON({
-          ok: false,
-          message: 'Action POST tidak dikenal: ' + action
-        });
+      return json({
+        ok: true,
+        message: 'Produk tersimpan',
+        kodeProduk: code
+      });
     }
+
+
+    /* TAMBAH / EDIT KARYAWAN */
+    if (a === 'savekaryawan') {
+      const all = rows('Karyawan');
+      const kid = d.id || id('KRY');
+
+      const obj = {
+        ID: kid,
+        Nama: d.nama,
+        Telepon: d.telepon,
+        Jabatan: d.jabatan,
+        'Upah Harian': num(d.upahHarian),
+        Status: d.status || 'Aktif',
+        Dibuat: new Date()
+      };
+
+      const found = all.findIndex(
+        x => String(x.ID) === String(kid)
+      );
+
+      if (found >= 0) {
+        const s = sheet('Karyawan');
+        const h = SHEETS.Karyawan;
+
+        s.getRange(found + 2, 1, 1, h.length)
+          .setValues([
+            h.map(k =>
+              obj[k] === undefined ? '' : obj[k]
+            )
+          ]);
+      } else {
+        append('Karyawan', obj);
+      }
+
+      return json({
+        ok: true,
+        message: 'Data karyawan tersimpan',
+        id: kid
+      });
+    }
+
+
+    /* SIMPAN ABSENSI */
+    if (a === 'saveabsensi') {
+      const emp = rows('Karyawan').find(
+        x => String(x.ID) === String(d.karyawanId)
+      );
+
+      if (!emp) {
+        throw Error('Karyawan tidak ditemukan');
+      }
+
+      const sh = sheet('Absensi');
+      const all = rows('Absensi');
+
+      const idx = all.findIndex(x =>
+        fmtDate(x.Tanggal) === d.tanggal &&
+        String(x['Karyawan ID']) === String(d.karyawanId)
+      );
+
+      const obj = {
+        ID: id('ABS'),
+        Tanggal: d.tanggal,
+        'Karyawan ID': d.karyawanId,
+        Nama: emp.Nama,
+        Status: d.status,
+        Catatan: d.catatan
+      };
+
+      if (idx >= 0) {
+        sh.getRange(
+          idx + 2, 1, 1, SHEETS.Absensi.length
+        ).setValues([
+          SHEETS.Absensi.map(k =>
+            obj[k] === undefined ? '' : obj[k]
+          )
+        ]);
+      } else {
+        append('Absensi', obj);
+      }
+
+      return json({
+        ok: true,
+        message: 'Absensi tersimpan'
+      });
+    }
+
+
+    /* SIMPAN KASBON / PEMBAYARAN UPAH */
+    if (a === 'savekasbon') {
+      const emp = rows('Karyawan').find(
+        x => String(x.ID) === String(d.karyawanId)
+      );
+
+      if (!emp) {
+        throw Error('Karyawan tidak ditemukan');
+      }
+
+      append('Kasbon', {
+        'ID': id('KAS'),
+        'Tanggal': d.tanggal || new Date(),
+        'Karyawan ID': d.karyawanId,
+        'Nama': emp.Nama,
+        'Jenis': d.jenis,
+        'Nominal': num(d.nominal),
+        'Keterangan': d.keterangan
+      });
+
+      return json({
+        ok: true,
+        message: 'Kasbon/pembayaran tersimpan'
+      });
+    }
+
+
+    /* SIMPAN PENGATURAN */
+    if (a === 'savepengaturan') {
+      const sh = sheet('Pengaturan');
+
+      sh.clearContents();
+      sh.appendRow(['Kunci', 'Nilai']);
+
+      Object.keys(d)
+        .filter(k => k !== 'action')
+        .forEach(k => {
+          sh.appendRow([k, d[k]]);
+        });
+
+      return json({
+        ok: true,
+        message: 'Pengaturan tersimpan'
+      });
+    }
+
+
+    /* TAMBAH PENGELUARAN */
+    if (a === 'createexpense') {
+      const eid = id('EXP');
+
+      append('Pengeluaran', {
+        'ID Pengeluaran': eid,
+        'Tanggal': new Date(),
+        'Kategori': d.kategori,
+        'Nominal': num(d.nominal),
+        'Metode': d.metode,
+        'Supplier': d.supplier,
+        'Karyawan ID': d.karyawanId,
+        'Keterangan': d.keterangan
+      });
+
+      if (
+        d.kategori === 'Kasbon Karyawan' &&
+        d.karyawanId
+      ) {
+        const emp = rows('Karyawan').find(
+          x => String(x.ID) === String(d.karyawanId)
+        );
+
+        append('Kasbon', {
+          'ID': id('KAS'),
+          'Tanggal': new Date(),
+          'Karyawan ID': d.karyawanId,
+          'Nama': emp ? emp.Nama : '',
+          'Jenis': 'Kasbon',
+          'Nominal': num(d.nominal),
+          'Keterangan': d.keterangan
+        });
+      }
+
+      return json({
+        ok: true,
+        message: 'Pengeluaran tersimpan',
+        id: eid
+      });
+    }
+
+
+    /* PEMBAYARAN SERVIS BERTAHAP */
+    if (
+      a === 'bayarservis' ||
+      a === 'pembayaranservis'
+    ) {
+      const idServis = String(d.idServis || '').trim();
+      const nominal = num(d.nominal);
+
+      if (!idServis) {
+        throw Error('ID servis wajib diisi.');
+      }
+
+      if (!Number.isFinite(nominal) || nominal <= 0) {
+        throw Error('Nominal pembayaran harus lebih dari nol.');
+      }
+
+      const lock = LockService.getScriptLock();
+      lock.waitLock(15000);
+
+      try {
+        const sh = sheet('Servis');
+        const values = sh.getDataRange().getValues();
+
+        if (values.length < 2) {
+          throw Error('Data servis belum tersedia.');
+        }
+
+        const headers = values[0].map(String);
+        const col = {};
+
+        headers.forEach((h, i) => {
+          col[h] = i;
+        });
+
+        [
+          'ID Servis',
+          'Total Tagihan',
+          'Dibayar',
+          'Sisa Piutang',
+          'Status'
+        ].forEach(h => {
+          if (col[h] === undefined) {
+            throw Error('Kolom servis tidak ditemukan: ' + h);
+          }
+        });
+
+        let rowIndex = -1;
+        let service = null;
+
+        for (let i = 1; i < values.length; i++) {
+          if (
+            String(values[i][col['ID Servis']]) === idServis
+          ) {
+            rowIndex = i + 1;
+            service = values[i];
+            break;
+          }
+        }
+
+        if (rowIndex < 0) {
+          throw Error('Data servis ' + idServis + ' tidak ditemukan.');
+        }
+
+        const total = num(service[col['Total Tagihan']]);
+        const dibayarLama = num(service[col['Dibayar']]);
+        const sisaLama = Math.max(0, total - dibayarLama);
+
+        if (sisaLama <= 0) {
+          throw Error('Tagihan servis ini sudah lunas.');
+        }
+
+        if (nominal > sisaLama) {
+          throw Error(
+            'Pembayaran melebihi sisa tagihan Rp' +
+            sisaLama.toLocaleString('id-ID') + '.'
+          );
+        }
+
+        const dibayarBaru = dibayarLama + nominal;
+        const sisaBaru = Math.max(0, total - dibayarBaru);
+        const statusBaru = sisaBaru === 0
+          ? 'Lunas'
+          : 'Belum Lunas';
+
+        const book = ss();
+        let log = book.getSheetByName('PembayaranServis');
+
+        const logHeaders = [
+          'ID Pembayaran',
+          'Tanggal',
+          'ID Servis',
+          'Nama Pelanggan',
+          'Nominal',
+          'Metode',
+          'Catatan'
+        ];
+
+        if (!log) {
+          log = book.insertSheet('PembayaranServis');
+        }
+
+        if (log.getLastRow() === 0) {
+          log.appendRow(logHeaders);
+        } else {
+          const existing = log
+            .getRange(1, 1, 1, log.getLastColumn())
+            .getValues()[0]
+            .map(String);
+
+          logHeaders.forEach(h => {
+            if (!existing.includes(h)) {
+              log.getRange(
+                1, log.getLastColumn() + 1
+              ).setValue(h);
+              existing.push(h);
+            }
+          });
+        }
+
+        const logMap = {};
+
+        log.getRange(1, 1, 1, log.getLastColumn())
+          .getValues()[0]
+          .forEach((h, i) => {
+            logMap[String(h)] = i;
+          });
+
+        const logRow = new Array(log.getLastColumn()).fill('');
+
+        const logData = {
+          'ID Pembayaran': id('BYR'),
+          'Tanggal': new Date(),
+          'ID Servis': idServis,
+          'Nama Pelanggan':
+            col['Nama Pelanggan'] !== undefined
+              ? service[col['Nama Pelanggan']]
+              : '',
+          'Nominal': nominal,
+          'Metode': d.metode || 'Tunai',
+          'Catatan': d.catatan || ''
+        };
+
+        Object.keys(logData).forEach(k => {
+          if (logMap[k] !== undefined) {
+            logRow[logMap[k]] = logData[k];
+          }
+        });
+
+        log.appendRow(logRow);
+
+        sh.getRange(
+          rowIndex, col['Dibayar'] + 1
+        ).setValue(dibayarBaru);
+
+        sh.getRange(
+          rowIndex, col['Sisa Piutang'] + 1
+        ).setValue(sisaBaru);
+
+        sh.getRange(
+          rowIndex, col['Status'] + 1
+        ).setValue(statusBaru);
+
+        return json({
+          ok: true,
+          message: 'Pembayaran servis berhasil dicatat.',
+          idServis: idServis,
+          totalTagihan: total,
+          pembayaranTambahan: nominal,
+          totalDibayar: dibayarBaru,
+          sisaPiutang: sisaBaru,
+          status: statusBaru
+        });
+
+      } finally {
+        lock.releaseLock();
+      }
+    }
+
+
+    /* TAMBAH SERVIS */
+    if (a === 'createservis') {
+      const parts = Array.isArray(d.spareparts)
+        ? d.spareparts
+        : [];
+
+      const products = rows('Produk');
+      let partTotal = 0;
+
+      parts.forEach(p => {
+        const ix = products.findIndex(
+          x => String(x['Kode Produk']) === String(p.kode)
+        );
+
+        if (ix < 0) {
+          throw Error('Sparepart tidak ditemukan: ' + p.kode);
+        }
+
+        const pr = products[ix];
+        const qty = num(p.qty);
+
+        if (num(pr.Stok) < qty) {
+          throw Error('Stok tidak cukup untuk ' + pr['Nama Produk']);
+        }
+
+        partTotal += qty * num(pr['Harga Jual']);
+        updateStock(p.kode, -qty);
+      });
+
+      const total = num(d.biayaJasa) + partTotal;
+      const paid = num(d.dibayar);
+      const sid = id('SRV');
+
+      append('Servis', {
+        'ID Servis': sid,
+        'Tanggal': new Date(),
+        'Nama Pelanggan': d.namaPelanggan,
+        'WhatsApp': d.wa,
+        'Model HP': d.model,
+        'IMEI': d.imei,
+        'Keluhan': d.keluhan,
+        'Biaya Jasa': num(d.biayaJasa),
+        'Teknisi': d.teknisi,
+        'Karyawan ID': d.karyawanId,
+        'Catatan Internal': d.catatan,
+        'Sparepart JSON': JSON.stringify(parts),
+        'Total Tagihan': total,
+        'Dibayar': paid,
+        'Sisa Piutang': Math.max(0, total - paid),
+        'Status': paid >= total ? 'Lunas' : 'Belum Lunas'
+      });
+
+      return json({
+        ok: true,
+        message: 'Servis tersimpan',
+        idServis: sid,
+        total: total,
+        sisaPiutang: Math.max(0, total - paid)
+      });
+    }
+
+
+    /* TAMBAH PENJUALAN */
+    if (a === 'createsale') {
+      const items = Array.isArray(d.items) ? d.items : [];
+      let total = 0;
+
+      items.forEach(it => {
+        const pr = rows('Produk').find(
+          x => String(x['Kode Produk']) === String(it.kode)
+        );
+
+        if (!pr) {
+          throw Error('Produk tidak ditemukan');
+        }
+
+        const q = num(it.qty);
+
+        if (num(pr.Stok) < q) {
+          throw Error('Stok tidak cukup: ' + pr['Nama Produk']);
+        }
+
+        total += num(pr['Harga Jual']) * q;
+        updateStock(it.kode, -q);
+      });
+
+      total = Math.max(0, total - num(d.diskon));
+
+      const paid = num(d.dibayar);
+      const sid = id('JUAL');
+
+      append('Penjualan', {
+        'ID Penjualan': sid,
+        'Tanggal': new Date(),
+        'Nama Pelanggan': d.namaPelanggan,
+        'WhatsApp': d.wa,
+        'Karyawan ID': d.karyawanId,
+        'Items JSON': JSON.stringify(items),
+        'Diskon': num(d.diskon),
+        'Total': total,
+        'Dibayar': paid,
+        'Sisa Piutang': Math.max(0, total - paid),
+        'Metode': d.metode
+      });
+
+      return json({
+        ok: true,
+        message: 'Penjualan tersimpan',
+        idPenjualan: sid,
+        total: total,
+        sisaPiutang: Math.max(0, total - paid)
+      });
+    }
+
+    return json({
+      ok: false,
+      message: 'Action POST tidak dikenal: ' + a
+    });
+
   } catch (err) {
-    return fixzyJSON({
+    return json({
       ok: false,
       message: err.message
     });
-  } finally {
-    try {
-      lock.releaseLock();
-    } catch (ignore) {}
   }
 }
 
 
-/* ============================================================
-   PRODUK DAN STOK
-   ============================================================ */
-
-function fixzyCreateProduct(d) {
-  const code = fixzyText(d.kodeProduk) || fixzyID('PRD');
-
-  if (fixzyFind('Produk', 'Kode Produk', code)) {
-    throw new Error('Kode produk sudah digunakan.');
-  }
-
-  const obj = {
-    'Kode Produk': code,
-    'Nama Produk': fixzyText(d.namaProduk),
-    'Kategori': fixzyText(d.kategori),
-    'Merek': fixzyText(d.merek),
-    'Supplier': fixzyText(d.supplier),
-    'Stok': Math.max(0, fixzyNum(d.stokAwal)),
-    'Stok Minimum': Math.max(0, fixzyNum(d.stokMinimum)),
-    'Modal Satuan': fixzyNum(d.modal),
-    'Harga Jual': fixzyNum(d.hargaJual)
-  };
-
-  if (!obj['Nama Produk']) {
-    throw new Error('Nama produk wajib diisi.');
-  }
-
-  fixzyAppend('Produk', obj);
-
-  return {
-    ok: true,
-    message: 'Produk berhasil disimpan.',
-    kodeProduk: code
-  };
-}
-
-function fixzyStockChange(code, delta, type, reason, ref, petugas) {
-  const product = fixzyFind('Produk', 'Kode Produk', code);
-
-  if (!product) {
-    throw new Error('Produk tidak ditemukan: ' + code);
-  }
-
-  const before = fixzyNum(product.Stok);
-  const after = before + delta;
-
-  if (after < 0) {
-    throw new Error('Stok tidak mencukupi untuk ' + product['Nama Produk']);
-  }
-
-  const sh = fixzySheet('Produk');
-  const headers = fixzyHeaders('Produk');
-  const stockColumn = headers.indexOf('Stok') + 1;
-
-  if (stockColumn < 1) {
-    throw new Error('Kolom Stok tidak ditemukan.');
-  }
-
-  sh.getRange(product._row, stockColumn).setValue(after);
-
-  fixzyAppend('RiwayatStok', {
-    ID: fixzyID('STK'),
-    Tanggal: fixzyNow(),
-    'Kode Produk': code,
-    'Nama Produk': product['Nama Produk'],
-    Jenis: type,
-    Jumlah: Math.abs(delta),
-    'Stok Sebelum': before,
-    'Stok Sesudah': after,
-    Alasan: reason || '',
-    Referensi: ref || '',
-    Petugas: petugas || ''
-  });
-
-  return {
-    ok: true,
-    sebelum: before,
-    sesudah: after
-  };
-}
-
-function fixzyAdjustStock(d) {
-  const delta = fixzyNum(d.perubahan);
-
-  if (delta === 0) {
-    throw new Error('Isi jumlah perubahan stok selain nol.');
-  }
-
-  return {
-    ...fixzyStockChange(
-      d.kodeProduk,
-      delta,
-      delta > 0 ? 'Penambahan' : 'Pengurangan',
-      d.alasan || 'Penyesuaian stok',
-      d.referensi || '',
-      d.petugas || ''
-    ),
-    message: 'Stok berhasil diperbarui.'
-  };
-}
-
-function fixzyReturnStock(d) {
-  const qty = Math.abs(fixzyNum(d.jumlah));
-
-  if (qty <= 0) {
-    throw new Error('Jumlah pengembalian harus lebih dari nol.');
-  }
-
-  return {
-    ...fixzyStockChange(
-      d.kodeProduk,
-      qty,
-      'Retur',
-      d.alasan || 'Pengembalian stok',
-      d.referensi || '',
-      d.petugas || ''
-    ),
-    message: 'Pengembalian stok berhasil dicatat.'
-  };
-}
-
-
-/* ============================================================
-   KARYAWAN
-   ============================================================ */
-
-function fixzySaveEmployee(d) {
-  const name = fixzyText(d.nama);
-
-  if (!name) {
-    throw new Error('Nama karyawan wajib diisi.');
-  }
-
-  const employeeId = fixzyText(d.id) || fixzyID('KRY');
-
-  const obj = {
-    ID: employeeId,
-    Nama: name,
-    Telepon: fixzyText(d.telepon),
-    Jabatan: fixzyText(d.jabatan),
-    'Upah Harian': fixzyNum(d.upahHarian),
-    Status: fixzyText(d.status) || 'Aktif',
-    Dibuat: fixzyNow()
-  };
-
-  const old = fixzyFind('Karyawan', 'ID', employeeId);
-
-  if (old) {
-    fixzyUpdate('Karyawan', old._row, obj);
-  } else {
-    fixzyAppend('Karyawan', obj);
-  }
-
-  return {
-    ok: true,
-    message: 'Data karyawan berhasil disimpan.',
-    id: employeeId
-  };
-}
-
-function fixzySaveAttendance(d) {
-  const employee = fixzyFind('Karyawan', 'ID', d.karyawanId);
-
-  if (!employee) {
-    throw new Error('Karyawan tidak ditemukan.');
-  }
-
-  const date = fixzyText(d.tanggal) || fixzyDate(fixzyNow());
-  const all = fixzyRows('Absensi');
-
-  const old = all.find(function(row) {
-    return fixzyDate(row.Tanggal) === date &&
-      String(row['Karyawan ID']) === String(d.karyawanId);
-  });
-
-  const obj = {
-    ID: old ? old.ID : fixzyID('ABS'),
-    Tanggal: date,
-    'Karyawan ID': d.karyawanId,
-    Nama: employee.Nama,
-    Status: fixzyText(d.status) || 'Hadir',
-    Catatan: fixzyText(d.catatan)
-  };
-
-  if (old) {
-    fixzyUpdate('Absensi', old._row, obj);
-  } else {
-    fixzyAppend('Absensi', obj);
-  }
-
-  return {
-    ok: true,
-    message: 'Absensi berhasil disimpan.'
-  };
-}
-
-function fixzySaveKasbon(d) {
-  const employee = fixzyFind('Karyawan', 'ID', d.karyawanId);
-
-  if (!employee) {
-    throw new Error('Karyawan tidak ditemukan.');
-  }
-
-  const nominal = fixzyNum(d.nominal);
-
-  if (nominal <= 0) {
-    throw new Error('Nominal harus lebih dari nol.');
-  }
-
-  fixzyAppend('Kasbon', {
-    ID: fixzyID('KAS'),
-    Tanggal: d.tanggal || fixzyNow(),
-    'Karyawan ID': d.karyawanId,
-    Nama: employee.Nama,
-    Jenis: d.jenis || 'Kasbon',
-    Nominal: nominal,
-    Keterangan: fixzyText(d.keterangan),
-    Status: 'Aktif'
-  });
-
-  return {
-    ok: true,
-    message: 'Kasbon berhasil disimpan.'
-  };
-}
-
-
-/* ============================================================
-   PENGATURAN DAN PENGELUARAN
-   ============================================================ */
-
-function fixzySaveSettings(d) {
-  const sh = fixzySheet('Pengaturan');
-  const all = fixzyRows('Pengaturan');
-
-  Object.keys(d).forEach(function(key) {
-    if (key === 'action') return;
-
-    const old = all.find(function(row) {
-      return String(row.Kunci) === key;
-    });
-
-    if (old) {
-      fixzyUpdate('Pengaturan', old._row, {
-        Nilai: d[key]
-      });
-    } else {
-      fixzyAppend('Pengaturan', {
-        Kunci: key,
-        Nilai: d[key]
-      });
-    }
-  });
-
-  return {
-    ok: true,
-    message: 'Pengaturan berhasil disimpan.'
-  };
-}
-
-function fixzyCreateExpense(d) {
-  const id = fixzyID('EXP');
-
-  fixzyAppend('Pengeluaran', {
-    'ID Pengeluaran': id,
-    Tanggal: d.tanggal || fixzyNow(),
-    Kategori: fixzyText(d.kategori),
-    Nominal: fixzyNum(d.nominal),
-    Metode: fixzyText(d.metode),
-    Supplier: fixzyText(d.supplier),
-    'Karyawan ID': fixzyText(d.karyawanId),
-    Keterangan: fixzyText(d.keterangan),
-    'Referensi ID': fixzyText(d.referensiId)
-  });
-
-  if (
-    d.kategori === 'Kasbon Karyawan' &&
-    d.karyawanId
-  ) {
-    const employee = fixzyFind(
-      'Karyawan',
-      'ID',
-      d.karyawanId
-    );
-
-    fixzyAppend('Kasbon', {
-      ID: fixzyID('KAS'),
-      Tanggal: d.tanggal || fixzyNow(),
-      'Karyawan ID': d.karyawanId,
-      Nama: employee ? employee.Nama : '',
-      Jenis: 'Kasbon',
-      Nominal: fixzyNum(d.nominal),
-      Keterangan: fixzyText(d.keterangan),
-      Status: 'Aktif'
-    });
-  }
-
-  return {
-    ok: true,
-    message: 'Pengeluaran berhasil disimpan.',
-    id: id
-  };
-}
-
-
-/* ============================================================
-   SERVIS
-   ============================================================ */
-
-function fixzyCreateService(d) {
-  const parts = Array.isArray(d.spareparts)
-    ? d.spareparts
-    : [];
-
-  const serviceId = fixzyID('SRV');
-
-  // Validasi semua sparepart sebelum stok diubah.
-  const validated = [];
-  let partTotal = 0;
-
-  parts.forEach(function(part) {
-    const qty = fixzyNum(part.qty);
-
-    if (qty <= 0) {
-      throw new Error('Jumlah sparepart harus lebih dari nol.');
-    }
-
-    const product = fixzyFind(
-      'Produk',
-      'Kode Produk',
-      part.kode
-    );
-
-    if (!product) {
-      throw new Error('Sparepart tidak ditemukan: ' + part.kode);
-    }
-
-    if (fixzyNum(product.Stok) < qty) {
-      throw new Error(
-        'Stok tidak cukup untuk ' + product['Nama Produk']
-      );
-    }
-
-    partTotal += qty * fixzyNum(product['Harga Jual']);
-
-    validated.push({
-      kode: part.kode,
-      qty: qty,
-      nama: product['Nama Produk']
-    });
-  });
-
-  const jasa = fixzyNum(d.biayaJasa);
-  const riskCost = fixzyNum(d.biayaRisiko);
-  const total = jasa + partTotal;
-  const paid = Math.min(total, Math.max(0, fixzyNum(d.dibayar)));
-
-  const history = [{
-    status: 'Masuk Antrian',
-    tanggal: fixzyNow()
-  }];
-
-  const obj = {
-    'ID Servis': serviceId,
-    Tanggal: fixzyNow(),
-    'Nama Pelanggan': fixzyText(d.namaPelanggan),
-    WhatsApp: fixzyText(d.wa),
-    'Model HP': fixzyText(d.model),
-    IMEI: fixzyText(d.imei),
-    Keluhan: fixzyText(d.keluhan),
-    'Biaya Jasa': jasa,
-    Teknisi: fixzyText(d.teknisi),
-    'Karyawan ID': fixzyText(d.karyawanId),
-    'Catatan Internal': fixzyText(d.catatan),
-    'Sparepart JSON': JSON.stringify(validated),
-    'Total Tagihan': total,
-    Dibayar: paid,
-    'Sisa Piutang': Math.max(0, total - paid),
-
-    // Kolom Status lama tetap dipakai untuk status pembayaran.
-    Status: paid >= total ? 'Lunas' : 'Belum Lunas',
-
-    'Jenis Kunci': fixzyText(d.jenisKunci),
-    'PIN/Pola': fixzyText(d.pinPola),
-    'Biaya Risiko': riskCost,
-    'Riwayat Status': JSON.stringify(history),
-    'Status Pengerjaan': 'Masuk Antrian'
-  };
-
-  // Simpan servis terlebih dahulu setelah validasi berhasil.
-  fixzyAppend('Servis', obj);
-
-  // Stok dikurangi dan setiap perubahan dicatat.
-  validated.forEach(function(part) {
-    fixzyStockChange(
-      part.kode,
-      -part.qty,
-      'Servis',
-      'Pemakaian sparepart servis',
-      serviceId,
-      d.teknisi || ''
-    );
-  });
-
-  return {
-    ok: true,
-    message: 'Servis berhasil disimpan.',
-    idServis: serviceId,
-    total: total,
-    sisaPiutang: Math.max(0, total - paid)
-  };
-}
-
-function fixzyUpdateServiceStatus(d) {
-  const serviceId = fixzyText(d.idServis);
-  const newStatus = fixzyText(d.status);
-
-  if (FIXZY_STATUS_PENGERJAAN.indexOf(newStatus) === -1) {
-    throw new Error('Status pengerjaan tidak valid.');
-  }
-
-  const old = fixzyFind('Servis', 'ID Servis', serviceId);
-
-  if (!old) {
-    throw new Error('Data servis tidak ditemukan.');
-  }
-
-  let history = [];
-
-  try {
-    history = JSON.parse(old['Riwayat Status'] || '[]');
-  } catch (ignore) {
-    history = [];
-  }
-
-  history.push({
-    status: newStatus,
-    tanggal: fixzyNow(),
-    catatan: fixzyText(d.catatan)
-  });
-
-  fixzyUpdate('Servis', old._row, {
-    'Status Pengerjaan': newStatus,
-    'Riwayat Status': JSON.stringify(history)
-  });
-
-  return {
-    ok: true,
-    message: 'Status pengerjaan diperbarui.',
-    status: newStatus
-  };
-}
-
-function fixzyUpdateService(d) {
-  const serviceId = fixzyText(d.idServis);
-  const old = fixzyFind('Servis', 'ID Servis', serviceId);
-
-  if (!old) {
-    throw new Error('Data servis tidak ditemukan.');
-  }
-
-  // Fungsi ini mengubah data dasar, bukan mengganti stok sparepart.
-  // Perubahan sparepart perlu diproses dengan mekanisme retur dan
-  // pemakaian stok terpisah agar stok tidak menjadi tidak akurat.
-  const fields = {
-    'Nama Pelanggan': fixzyText(d.namaPelanggan),
-    WhatsApp: fixzyText(d.wa),
-    'Model HP': fixzyText(d.model),
-    IMEI: fixzyText(d.imei),
-    Keluhan: fixzyText(d.keluhan),
-    'Biaya Jasa': fixzyNum(d.biayaJasa),
-    Teknisi: fixzyText(d.teknisi),
-    'Karyawan ID': fixzyText(d.karyawanId),
-    'Catatan Internal': fixzyText(d.catatan),
-    'Jenis Kunci': fixzyText(d.jenisKunci),
-    'PIN/Pola': fixzyText(d.pinPola),
-    'Biaya Risiko': fixzyNum(d.biayaRisiko)
-  };
-
-  const total = fields['Biaya Jasa'] +
-    fixzyPartsTotal(old['Sparepart JSON']);
-
-  const paid = fixzyNum(old.Dibayar);
-
-  fields['Total Tagihan'] = total;
-  fields['Sisa Piutang'] = Math.max(0, total - paid);
-  fields.Status = paid >= total ? 'Lunas' : 'Belum Lunas';
-
-  fixzyUpdate('Servis', old._row, fields);
-
-  return {
-    ok: true,
-    message: 'Data servis berhasil diperbarui.',
-    total: total
-  };
-}
-
-function fixzyPartsTotal(jsonText) {
-  let parts = [];
-
-  try {
-    parts = JSON.parse(jsonText || '[]');
-  } catch (ignore) {
-    return 0;
-  }
-
-  return parts.reduce(function(sum, part) {
-    const product = fixzyFind(
-      'Produk',
-      'Kode Produk',
-      part.kode
-    );
-
-    return sum + fixzyNum(part.qty) *
-      (product ? fixzyNum(product['Harga Jual']) : 0);
-  }, 0);
-}
-
-function fixzyDeleteService(d) {
-  const serviceId = fixzyText(d.idServis);
-  const old = fixzyFind('Servis', 'ID Servis', serviceId);
-
-  if (!old) {
-    throw new Error('Data servis tidak ditemukan.');
-  }
-
-  if (fixzyNum(old.Dibayar) > 0) {
-    throw new Error(
-      'Servis sudah memiliki pembayaran. Selesaikan koreksi pembayaran terlebih dahulu.'
-    );
-  }
-
-  // Mengembalikan sparepart yang sebelumnya dipakai.
-  let parts = [];
-
-  try {
-    parts = JSON.parse(old['Sparepart JSON'] || '[]');
-  } catch (ignore) {
-    parts = [];
-  }
-
-  parts.forEach(function(part) {
-    fixzyStockChange(
-      part.kode,
-      fixzyNum(part.qty),
-      'Retur Pembatalan Servis',
-      'Pengembalian stok dari servis yang dihapus',
-      serviceId,
-      ''
-    );
-  });
-
-  fixzyDeleteRows('Servis', [old._row]);
-
-  return {
-    ok: true,
-    message: 'Servis dihapus dan stok sparepart dikembalikan.'
-  };
-}
-
-function fixzyDeleteManyServices(d) {
-  const ids = Array.isArray(d.ids)
-    ? d.ids.map(String)
-    : [];
-
-  if (!ids.length) {
-    throw new Error('Pilih minimal satu servis.');
-  }
-
-  const all = fixzyRows('Servis');
-  const selected = all.filter(function(row) {
-    return ids.indexOf(String(row['ID Servis'])) !== -1;
-  });
-
-  const blocked = selected.filter(function(row) {
-    return fixzyNum(row.Dibayar) > 0;
-  });
-
-  if (blocked.length) {
-    throw new Error(
-      'Ada servis yang sudah dibayar. Data tersebut tidak dihapus.'
-    );
-  }
-
-  selected.forEach(function(row) {
-    let parts = [];
-
-    try {
-      parts = JSON.parse(row['Sparepart JSON'] || '[]');
-    } catch (ignore) {
-      parts = [];
-    }
-
-    parts.forEach(function(part) {
-      fixzyStockChange(
-        part.kode,
-        fixzyNum(part.qty),
-        'Retur Pembatalan Servis',
-        'Pengembalian stok dari servis yang dihapus',
-        row['ID Servis'],
-        ''
-      );
-    });
-  });
-
-  fixzyDeleteRows(
-    'Servis',
-    selected.map(function(row) {
-      return row._row;
-    })
+/* =========================
+   UPDATE STOK
+========================= */
+
+function updateStock(code, delta) {
+  const s = sheet('Produk');
+  const all = rows('Produk');
+
+  const i = all.findIndex(
+    x => String(x['Kode Produk']) === String(code)
   );
 
-  return {
-    ok: true,
-    message: selected.length + ' servis berhasil dihapus.'
-  };
+  if (i < 0) {
+    throw Error('Produk tidak ditemukan');
+  }
+
+  s.getRange(i + 2, 6)
+    .setValue(num(all[i].Stok) + delta);
 }
 
 
-/* ============================================================
-   BIAYA RISIKO SERVIS
-   ============================================================ */
+/* =========================
+   UTILITAS
+========================= */
 
-function fixzyCreateRiskCost(d) {
-  const service = fixzyFind(
-    'Servis',
-    'ID Servis',
-    d.idServis
+function num(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+
+function fmtDate(v) {
+  if (v instanceof Date) {
+    return Utilities.formatDate(
+      v,
+      Session.getScriptTimeZone(),
+      'yyyy-MM-dd'
+    );
+  }
+
+  return String(v || '').slice(0, 10);
+}
+
+
+/* =========================
+   HITUNG UPAH KARYAWAN
+========================= */
+
+function calcPayroll(month) {
+  const emp = rows('Karyawan');
+
+  const att = rows('Absensi').filter(
+    x => fmtDate(x.Tanggal).slice(0, 7) === month
   );
 
-  if (!service) {
-    throw new Error('ID servis tidak ditemukan.');
-  }
-
-  const nominal = fixzyNum(d.nominal);
-
-  if (nominal < 0) {
-    throw new Error('Nominal tidak boleh negatif.');
-  }
-
-  const employee = d.karyawanId
-    ? fixzyFind('Karyawan', 'ID', d.karyawanId)
-    : null;
-
-  fixzyAppend('BiayaRisiko', {
-    ID: fixzyID('RSK'),
-    Tanggal: fixzyNow(),
-    'ID Servis': d.idServis,
-    'Karyawan ID': d.karyawanId || '',
-    'Nama Karyawan': employee ? employee.Nama : '',
-    Nominal: nominal,
-    Keterangan: fixzyText(d.keterangan),
-    Status: 'Dicatat'
-  });
-
-  return {
-    ok: true,
-    message: 'Biaya risiko berhasil dicatat.'
-  };
-}
-
-
-/* ============================================================
-   PENJUALAN
-   ============================================================ */
-
-function fixzyCreateSale(d) {
-  const items = Array.isArray(d.items) ? d.items : [];
-
-  if (!items.length) {
-    throw new Error('Item penjualan belum diisi.');
-  }
-
-  let total = 0;
-  const validated = [];
-
-  items.forEach(function(item) {
-    const product = fixzyFind(
-      'Produk',
-      'Kode Produk',
-      item.kode
-    );
-
-    if (!product) {
-      throw new Error('Produk tidak ditemukan: ' + item.kode);
-    }
-
-    const qty = fixzyNum(item.qty);
-
-    if (qty <= 0) {
-      throw new Error('Jumlah produk harus lebih dari nol.');
-    }
-
-    if (fixzyNum(product.Stok) < qty) {
-      throw new Error('Stok tidak cukup: ' + product['Nama Produk']);
-    }
-
-    total += qty * fixzyNum(product['Harga Jual']);
-
-    validated.push({
-      kode: item.kode,
-      qty: qty
-    });
-  });
-
-  total = Math.max(0, total - fixzyNum(d.diskon));
-
-  const paid = Math.min(
-    total,
-    Math.max(0, fixzyNum(d.dibayar))
+  const kas = rows('Kasbon').filter(
+    x => fmtDate(x.Tanggal).slice(0, 7) === month
   );
 
-  const saleId = fixzyID('JUAL');
+  return emp.map(e => {
+    const a = att.filter(
+      x =>
+        String(x['Karyawan ID']) === String(e.ID) &&
+        x.Status === 'Hadir'
+    ).length;
 
-  fixzyAppend('Penjualan', {
-    'ID Penjualan': saleId,
-    Tanggal: fixzyNow(),
-    'Nama Pelanggan': fixzyText(d.namaPelanggan),
-    WhatsApp: fixzyText(d.wa),
-    'Karyawan ID': fixzyText(d.karyawanId),
-    'Items JSON': JSON.stringify(validated),
-    Diskon: fixzyNum(d.diskon),
-    Total: total,
-    Dibayar: paid,
-    'Sisa Piutang': Math.max(0, total - paid),
-    Metode: fixzyText(d.metode)
-  });
+    const gross = a * num(e['Upah Harian']);
 
-  validated.forEach(function(item) {
-    fixzyStockChange(
-      item.kode,
-      -item.qty,
-      'Penjualan',
-      'Stok terjual',
-      saleId,
-      d.karyawanId || ''
+    const k = kas.filter(
+      x =>
+        String(x['Karyawan ID']) === String(e.ID) &&
+        x.Jenis === 'Kasbon'
+    ).reduce(
+      (s, x) => s + num(x.Nominal),
+      0
     );
-  });
 
-  return {
-    ok: true,
-    message: 'Penjualan berhasil disimpan.',
-    idPenjualan: saleId,
-    total: total,
-    sisaPiutang: Math.max(0, total - paid)
-  };
-}
-
-
-/* ============================================================
-   LAPORAN UPAH DAN DASHBOARD
-   ============================================================ */
-
-function fixzyPayroll(month) {
-  const employees = fixzyRows('Karyawan');
-
-  const attendance = fixzyRows('Absensi').filter(function(row) {
-    return fixzyDate(row.Tanggal).substring(0, 7) === month;
-  });
-
-  const advances = fixzyRows('Kasbon').filter(function(row) {
-    return fixzyDate(row.Tanggal).substring(0, 7) === month;
-  });
-
-  return employees.map(function(employee) {
-    const present = attendance.filter(function(row) {
-      return String(row['Karyawan ID']) === String(employee.ID) &&
-        String(row.Status).toLowerCase() === 'hadir';
-    }).length;
-
-    const gross = present * fixzyNum(employee['Upah Harian']);
-
-    const loan = advances.filter(function(row) {
-      return String(row['Karyawan ID']) === String(employee.ID) &&
-        String(row.Jenis).toLowerCase() === 'kasbon';
-    }).reduce(function(sum, row) {
-      return sum + fixzyNum(row.Nominal);
-    }, 0);
-
-    const paid = advances.filter(function(row) {
-      return String(row['Karyawan ID']) === String(employee.ID) &&
-        String(row.Jenis).toLowerCase() === 'pembayaran upah';
-    }).reduce(function(sum, row) {
-      return sum + fixzyNum(row.Nominal);
-    }, 0);
+    const paid = kas.filter(
+      x =>
+        String(x['Karyawan ID']) === String(e.ID) &&
+        x.Jenis === 'Pembayaran Upah'
+    ).reduce(
+      (s, x) => s + num(x.Nominal),
+      0
+    );
 
     return {
-      ID: employee.ID,
-      Nama: employee.Nama,
-      HariHadir: present,
+      ID: e.ID,
+      Nama: e.Nama,
+      HariHadir: a,
       UpahKotor: gross,
-      Kasbon: loan,
+      Kasbon: k,
       SudahDibayar: paid,
-      SisaUpah: Math.max(0, gross - loan - paid)
+      SisaUpah: Math.max(0, gross - k - paid)
     };
   });
-}
-
-function fixzyDashboard() {
-  const services = fixzyRows('Servis');
-  const sales = fixzyRows('Penjualan');
-  const products = fixzyRows('Produk');
-  const expenses = fixzyRows('Pengeluaran');
-
-  return {
-    jumlahServis: services.length,
-
-    totalPiutangServis: services.reduce(function(sum, row) {
-      return sum + fixzyNum(row['Sisa Piutang']);
-    }, 0),
-
-    totalPenjualan: sales.reduce(function(sum, row) {
-      return sum + fixzyNum(row.Total);
-    }, 0),
-
-    totalPengeluaran: expenses.reduce(function(sum, row) {
-      return sum + fixzyNum(row.Nominal);
-    }, 0),
-
-    stokMenipis: products.filter(function(row) {
-      return fixzyNum(row.Stok) <=
-        fixzyNum(row['Stok Minimum']);
-    }).length
-  };
 }
