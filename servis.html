@@ -1,74 +1,1226 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIXZY | Input Servis</title><style>
-:root{--ink:#17191c;--muted:#737780;--line:#e8e9ec;--paper:#f5f6f8;--white:#fff;--yellow:#f4c430;--yellow-soft:#fff4c7;--blue:#1769aa;--blue-soft:#e8f3ff;--red:#d9363e;--red-soft:#fff0f0;--radius:17px}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}.topbar{height:76px;background:#151719;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:3px solid var(--yellow);position:sticky;top:0;z-index:10}.brand{display:flex;align-items:center;gap:12px}.brand-logo{display:block;width:48px;height:48px;object-fit:contain;background:#000;border:1px solid var(--yellow);border-radius:10px;padding:3px;flex:0 0 auto}.brand b{display:block;letter-spacing:2px;font-size:19px}.brand small{display:block;color:#b6b8bd;font-size:9px;letter-spacing:1.2px}.top-actions{display:flex;align-items:center;gap:12px}.pill{font-size:11px;padding:6px 10px;border-radius:30px;background:#30343a;color:#fff}.pill.ok{background:#163d2b;color:#9cf0bd}.pill.bad{background:#522b2b;color:#ffb6b6}.layout{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100vh - 76px)}.sidebar{background:white;border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:6px}.nav-label{font-size:10px;font-weight:800;color:#9a9da4;letter-spacing:1.5px;padding:7px 12px 12px}.nav{display:flex;align-items:center;gap:12px;text-align:left;width:100%;border:0;background:transparent;color:#5e626a;padding:12px;border-radius:11px;font-weight:650;cursor:pointer}.nav span{font-size:13px}.nav:hover,.nav.active{background:#fff5ce;color:#191a1c}.nav.active{box-shadow:inset 3px 0 var(--yellow)}.sidebar-note{margin-top:auto;border:1px solid var(--line);background:#fafafa;border-radius:12px;padding:14px}.sidebar-note b,.sidebar-note small{display:block}.sidebar-note b{font-size:10px;letter-spacing:1px}.sidebar-note small{font-size:11px;color:var(--muted);margin-top:4px}.main{padding:28px;min-width:0;max-width:1600px;width:100%;margin:auto}.page{display:none}.page.active{display:block}.page-head{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:24px}.eyebrow{font-size:10px;font-weight:850;letter-spacing:1.8px;color:#a27a00;margin:0 0 6px}.page h1{font-size:30px;letter-spacing:-1px;margin:0}.sub{color:var(--muted);margin:5px 0 0;font-size:12px}.date-chip{background:white;border:1px solid var(--line);padding:9px 13px;border-radius:10px;font-size:12px;color:#5d6067}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:20px}.stat,.panel{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 3px 12px #1a1c2105}.stat{border-top:3px solid var(--yellow)}.stat span,.stat small{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:26px;letter-spacing:-.7px;margin:10px 0 5px}.stat small{font-size:10px}.two-col{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:18px}.panel h2{font-size:16px;margin:0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:17px}.panel-head p{color:var(--muted);font-size:11px;margin:4px 0 0}.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.quick-grid button{display:flex;align-items:center;gap:11px;padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;text-align:left;font-size:12px;font-weight:700}.quick-grid button:hover{border-color:#e3bc28;background:#fffdf5}.quick-grid b{display:grid;place-items:center;width:30px;height:30px;background:var(--yellow-soft);border-radius:9px;font-size:18px}.notice{margin-top:18px;border:1px solid #f0d87e;background:#fffbeb;padding:14px;border-radius:12px}.notice b{font-size:12px}.notice p{font-size:11px;color:#6c6241;margin:5px 0 0}.btn{border:1px solid transparent;border-radius:10px;padding:10px 15px;font-weight:750;font-size:12px;cursor:pointer;white-space:nowrap}.btn.primary{background:var(--yellow);color:#17191c}.btn.primary:hover{background:#e9b90d}.btn.ghost{background:white;border-color:#dfe1e5;color:#363940}.btn.small{padding:7px 10px;font-size:11px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;margin-bottom:20px}.form-grid label{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:750;color:#42464d}.form-grid input,.form-grid select,.form-grid textarea{font:inherit;font-weight:450;color:#202328;border:1px solid #dfe1e5;background:#fff;border-radius:9px;padding:11px 12px;width:100%;outline:none}.form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{border-color:#d6ac13;box-shadow:0 0 0 3px #f4c43028}.span-2{grid-column:span 2}.form-footer{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.form-message{font-size:12px;color:#4b6d31}.empty{padding:24px;text-align:center;color:#999da5;font-size:12px}.table-wrap{overflow:auto;width:100%}table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}th{text-align:left;background:#f7f7f8;color:#6d7179;font-size:10px;text-transform:uppercase;letter-spacing:.5px}th,td{padding:12px;border-bottom:1px solid #eceef1}td{color:#373b42}.tabs{display:flex;gap:7px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow:auto}.tab{border:0;border-bottom:2px solid transparent;background:transparent;padding:10px 14px;font-size:12px;color:var(--muted);cursor:pointer}.tab.active{border-color:var(--yellow);color:#17191c;font-weight:800}footer{text-align:center;color:#a2a5ac;font-size:10px;padding:32px 0 10px}.toast{position:fixed;right:22px;bottom:22px;background:#191b1e;color:white;padding:14px 18px;border-radius:12px;box-shadow:0 10px 35px #0002;max-width:360px;display:none;z-index:30}.toast.show{display:block}@media(max-width:1000px){.layout{grid-template-columns:190px minmax(0,1fr)}.main{padding:22px}.stats{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}@media(max-width:700px){.topbar{padding:0 15px;height:68px}.brand small{font-size:8px}.top-actions .pill{display:none}.layout{display:block}.sidebar{position:sticky;top:68px;z-index:8;display:flex;flex-direction:row;overflow:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line);gap:4px}.nav-label,.sidebar-note{display:none}.nav{min-width:max-content;width:auto;padding:10px 12px}.main{padding:18px 13px}.page h1{font-size:25px}.page-head{align-items:flex-start}.date-chip{display:none}.stats{gap:9px}.stat{padding:14px}.stat strong{font-size:21px}.panel{padding:15px}.form-grid{grid-template-columns:1fr;gap:13px}.span-2{grid-column:span 1}.form-footer{align-items:flex-start}.quick-grid{grid-template-columns:1fr 1fr}}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIXZY | Input Servis</title>
 
-/* FIXZY logo sizing fix: keep the logo confined to the header badge */
-header.topbar .brand img.brand-logo,
-.topbar .brand-logo {
-  display: block !important;
-  width: 48px !important;
-  min-width: 48px !important;
-  max-width: 48px !important;
-  height: 48px !important;
-  min-height: 48px !important;
-  max-height: 48px !important;
-  object-fit: contain !important;
-  object-position: center !important;
-  padding: 3px !important;
-  margin: 0 !important;
-  flex: 0 0 48px !important;
-  background: #000 !important;
-  border: 1px solid var(--yellow) !important;
-  border-radius: 10px !important;
+<style>
+:root{
+  --ink:#17191c;
+  --muted:#737780;
+  --line:#e5e7eb;
+  --paper:#f5f6f8;
+  --white:#fff;
+  --yellow:#f4c430;
+  --blue:#1769aa;
+  --red:#d9363e;
+  --green:#198754;
+  --radius:15px;
 }
-header.topbar .brand { min-width: 0; }
-header.topbar .brand img { position: static !important; }
-@media (max-width: 700px) {
-  header.topbar .brand img.brand-logo,
-  .topbar .brand-logo {
-    width: 42px !important;
-    min-width: 42px !important;
-    max-width: 42px !important;
-    height: 42px !important;
-    min-height: 42px !important;
-    max-height: 42px !important;
-    flex-basis: 42px !important;
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+.topbar{
+  min-height:72px;
+  background:linear-gradient(105deg,#151719,#17191c 70%,#102c48);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 22px;
+  border-bottom:3px solid var(--yellow);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:white;
+  text-decoration:none;
+  min-width:0;
+}
+
+.brand-logo{
+  width:46px;
+  height:46px;
+  object-fit:contain;
+  padding:3px;
+  background:#000;
+  border:1px solid var(--yellow);
+  border-radius:10px;
+  flex-shrink:0;
+}
+
+.brand b{
+  display:block;
+  font-size:19px;
+  letter-spacing:2px;
+}
+
+.brand small{
+  display:block;
+  color:#c1c4ca;
+  font-size:9px;
+  letter-spacing:1px;
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.pill{
+  border-radius:20px;
+  padding:6px 10px;
+  background:#30343a;
+  color:white;
+  font-size:11px;
+}
+
+.pill.ok{background:#174c35;color:#a5f1c4}
+.pill.bad{background:#622c31;color:#ffc1c5}
+
+.btn{
+  border:1px solid transparent;
+  border-radius:9px;
+  padding:10px 14px;
+  font-size:12px;
+  font-weight:750;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.btn.primary{
+  background:var(--yellow);
+  color:#17191c;
+  border-bottom:3px solid #d5a900;
+}
+
+.btn.secondary{
+  background:#edf4fa;
+  border-color:#cbdfee;
+  color:#15558a;
+}
+
+.btn.ghost{
+  background:white;
+  color:#222;
+}
+
+.btn.danger{
+  background:var(--red);
+  color:white;
+}
+
+.btn.whatsapp{
+  background:#16884b;
+  color:white;
+}
+
+.btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:220px minmax(0,1fr);
+  min-height:calc(100vh - 72px);
+}
+
+.sidebar{
+  background:white;
+  border-right:1px solid var(--line);
+  padding:18px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.nav-label{
+  padding:8px 12px;
+  color:#969aa2;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.5px;
+}
+
+.nav{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  border-radius:10px;
+  text-decoration:none;
+  color:#5b6068;
+  font-weight:650;
+  font-size:12px;
+}
+
+.nav:hover{
+  background:#e8f3ff;
+  color:#15558a;
+}
+
+.nav.active{
+  background:linear-gradient(90deg,#fff4c7,#e8f3ff);
+  color:#17191c;
+  box-shadow:inset 3px 0 var(--yellow);
+}
+
+.sidebar-note{
+  margin-top:auto;
+  border:1px solid var(--line);
+  border-top:2px solid var(--blue);
+  border-radius:12px;
+  padding:13px;
+  background:#fafafa;
+}
+
+.sidebar-note b,
+.sidebar-note small{
+  display:block;
+}
+
+.sidebar-note b{font-size:10px;letter-spacing:1px}
+.sidebar-note small{font-size:11px;color:var(--muted);margin-top:4px}
+
+.main{
+  width:100%;
+  max-width:1500px;
+  margin:auto;
+  padding:25px;
+  min-width:0;
+}
+
+.page-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.eyebrow{
+  color:var(--blue);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:1.8px;
+  margin:0 0 5px;
+}
+
+h1{
+  margin:0;
+  font-size:28px;
+  letter-spacing:-.7px;
+}
+
+.sub{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.panel{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:18px;
+  box-shadow:0 3px 12px #1a1c2105;
+}
+
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:15px;
+}
+
+.panel-head h2{
+  margin:0;
+  font-size:16px;
+}
+
+.panel-head p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:0;
+}
+
+.field label{
+  font-size:12px;
+  font-weight:750;
+  color:#42464d;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  min-width:0;
+  padding:11px 12px;
+  border:1px solid #dfe1e5;
+  border-radius:9px;
+  background:white;
+  color:#202328;
+  font:inherit;
+  outline:none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px #1769aa20;
+}
+
+.span-2{grid-column:span 2}
+
+.field small{
+  color:var(--muted);
+  font-size:10px;
+}
+
+.form-footer{
+  grid-column:span 2;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+  padding-top:5px;
+}
+
+.form-message{
+  color:#356b38;
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
+
+.item-row{
+  display:grid;
+  grid-template-columns:minmax(150px,2fr) minmax(80px,.7fr) auto;
+  gap:10px;
+  align-items:end;
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:12px;
+  margin-bottom:9px;
+}
+
+.item-row label{
+  display:block;
+  font-size:11px;
+  font-weight:750;
+}
+
+.item-row select,
+.item-row input{
+  display:block;
+  width:100%;
+  margin-top:5px;
+  padding:10px;
+  border:1px solid #dfe1e5;
+  border-radius:8px;
+  background:white;
+  font:inherit;
+}
+
+.total-box{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:16px;
+}
+
+.total-item{
+  padding:13px;
+  background:#f7f8fa;
+  border:1px solid var(--line);
+  border-radius:11px;
+}
+
+.total-item span{
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.total-item strong{
+  display:block;
+  margin-top:5px;
+  font-size:17px;
+  overflow-wrap:anywhere;
+}
+
+.total-item.highlight{
+  background:#fff5ce;
+  border-color:#ecd67e;
+}
+
+.notice{
+  padding:12px;
+  border:1px solid #f0d87e;
+  border-radius:10px;
+  background:#fffbeb;
+  color:#6c6241;
+  font-size:11px;
+  margin-bottom:15px;
+}
+
+.empty{
+  padding:22px;
+  text-align:center;
+  color:#999da5;
+  font-size:12px;
+}
+
+footer{
+  padding:25px 0 10px;
+  text-align:center;
+  color:#a2a5ac;
+  font-size:10px;
+}
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:99;
+  max-width:calc(100% - 40px);
+  padding:13px 16px;
+  border-radius:10px;
+  background:#17191c;
+  color:white;
+  box-shadow:0 8px 25px #0002;
+  display:none;
+}
+
+.toast.show{display:block}
+
+@media(max-width:800px){
+  .layout{display:block}
+  .sidebar{
+    position:sticky;
+    top:72px;
+    z-index:15;
+    flex-direction:row;
+    overflow-x:auto;
+    padding:7px;
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+  .nav-label,.sidebar-note{display:none}
+  .nav{white-space:nowrap;min-width:max-content;padding:10px}
+  .main{padding:17px 12px}
+  .panel{padding:14px}
+  h1{font-size:24px}
+}
+
+@media(max-width:520px){
+  .topbar{padding:10px 12px}
+  .brand-logo{width:40px;height:40px}
+  .brand b{font-size:16px}
+  .brand small{font-size:8px}
+  .top-actions .pill{display:none}
+  .top-actions .btn{padding:9px}
+  .form-grid{grid-template-columns:1fr;gap:13px}
+  .span-2,.form-footer{grid-column:span 1}
+  .item-row{grid-template-columns:1fr 1fr}
+  .item-row .item-product{grid-column:span 2}
+  .item-row .remove-item{grid-column:span 2}
+  .total-box{grid-template-columns:1fr}
+  .total-item strong{font-size:19px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <a class="brand" href="index.html">
+    <img class="brand-logo" src="logofixzy.png" alt="FIXZY">
+    <div>
+      <b>FIXZY</b>
+      <small>PEMBUKUAN SERVIS & PENJUALAN</small>
+    </div>
+  </a>
+
+  <div class="top-actions">
+    <span id="apiStatus" class="pill">Memeriksa API...</span>
+    <a class="btn ghost" href="index.html">Dashboard</a>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="nav-label">MENU UTAMA</div>
+
+    <a class="nav" href="index.html">▦ Dashboard</a>
+    <a class="nav active" href="servis.html">＋ Input Servis</a>
+    <a class="nav" href="penjualan.html">▣ Penjualan</a>
+    <a class="nav" href="stok.html">▤ Stok Produk</a>
+    <a class="nav" href="pengeluaran.html">↘ Pengeluaran</a>
+    <a class="nav" href="data.html">☷ Data Transaksi</a>
+    <a class="nav" href="pengaturan.html">⚙ Pengaturan</a>
+    <a class="nav" href="karyawan.html">👥 Data Karyawan</a>
+    <a class="nav" href="absensi.html">🗓 Absensi</a>
+    <a class="nav" href="upah.html">💰 Upah Bulanan</a>
+
+    <div class="sidebar-note">
+      <b>FIXZY PERSONAL</b>
+      <small>Owner & karyawan</small>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-head">
+      <div>
+        <p class="eyebrow">PELANGGAN & PERANGKAT</p>
+        <h1>Input Servis</h1>
+        <p class="sub">Catat perangkat, keluhan, teknisi, biaya dan sparepart.</p>
+      </div>
+    </div>
+
+    <div class="notice">
+      <b>Perhatian:</b> PIN/pola adalah informasi sensitif.
+      Minta persetujuan pelanggan dan jangan mencantumkannya pada
+      nota publik atau pesan WhatsApp.
+    </div>
+
+    <form id="servisForm">
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Informasi pelanggan</h2>
+            <p>Data pemilik perangkat yang diservis.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Nama pelanggan *</label>
+            <input name="namaPelanggan" required>
+          </div>
+
+          <div class="field">
+            <label>Nomor WhatsApp</label>
+            <input name="wa" inputmode="tel" placeholder="08xxxxxxxxxx">
+          </div>
+
+          <div class="field">
+            <label>Merek / model HP *</label>
+            <input name="model" required placeholder="Contoh: Oppo A16">
+          </div>
+
+          <div class="field">
+            <label>IMEI / serial</label>
+            <input name="imei">
+          </div>
+
+          <div class="field span-2">
+            <label>Keluhan pelanggan *</label>
+            <textarea name="keluhan" rows="2" required
+              placeholder="Contoh: HP mati total, tidak mengisi daya"></textarea>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Kunci perangkat</h2>
+            <p>Isi hanya jika diperlukan dan disetujui pelanggan.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Jenis kunci layar</label>
+            <select name="jenisKunci" id="jenisKunci">
+              <option value="">Tidak diisi</option>
+              <option value="PIN">PIN</option>
+              <option value="Pola">Pola</option>
+              <option value="Password">Password</option>
+              <option value="Tidak Ada">Tidak ada kunci</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>PIN / pola</label>
+            <input name="pinPola" id="pinPola"
+              type="password" autocomplete="off"
+              placeholder="Opsional">
+            <small>Data ini akan disimpan di Spreadsheet. Batasi aksesnya.</small>
+          </div>
+
+          <div class="field span-2">
+            <label>Catatan internal teknisi</label>
+            <textarea name="catatan" rows="2"
+              placeholder="Catatan pemeriksaan, kondisi fisik, dan lainnya"></textarea>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Penugasan dan biaya</h2>
+            <p>Pilih teknisi yang menangani perangkat.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Teknisi / karyawan *</label>
+            <select name="karyawanId" id="employeeSelect" required>
+              <option value="">Memuat karyawan...</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Biaya jasa (Rp) *</label>
+            <input name="biayaJasa" id="biayaJasa"
+              type="number" min="0" step="1" required value="0">
+          </div>
+
+          <div class="field">
+            <label>Biaya risiko kerja (Rp)</label>
+            <input name="biayaRisiko" id="biayaRisiko"
+              type="number" min="0" step="1" value="0">
+            <small>Dicatat sebagai informasi internal, bukan otomatis ditambahkan ke tagihan pelanggan.</small>
+          </div>
+
+          <div class="field">
+            <label>Uang muka / pembayaran awal (Rp)</label>
+            <input name="dibayar" id="dibayar"
+              type="number" min="0" step="1" value="0">
+          </div>
+
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Sparepart servis</h2>
+            <p>Stok akan berkurang ketika transaksi berhasil disimpan.</p>
+          </div>
+
+          <button class="btn secondary" type="button" id="addServicePart">
+            ＋ Tambah sparepart
+          </button>
+        </div>
+
+        <div id="serviceParts">
+          <div class="empty">Belum ada sparepart ditambahkan.</div>
+        </div>
+
+        <div class="total-box">
+          <div class="total-item">
+            <span>Biaya jasa</span>
+            <strong id="previewJasa">Rp 0</strong>
+          </div>
+
+          <div class="total-item">
+            <span>Total sparepart</span>
+            <strong id="previewPart">Rp 0</strong>
+          </div>
+
+          <div class="total-item highlight">
+            <span>Estimasi total tagihan</span>
+            <strong id="previewTotal">Rp 0</strong>
+          </div>
+        </div>
+
+        <div class="total-box">
+          <div class="total-item">
+            <span>Pembayaran awal</span>
+            <strong id="previewDibayar">Rp 0</strong>
+          </div>
+
+          <div class="total-item">
+            <span>Estimasi sisa piutang</span>
+            <strong id="previewSisa">Rp 0</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="form-footer">
+          <button class="btn primary" id="saveServiceButton" type="submit">
+            Simpan Servis
+          </button>
+
+          <button class="btn secondary" type="button" id="resetServiceButton">
+            Bersihkan Form
+          </button>
+
+          <span class="form-message" id="servisMessage" role="status"></span>
+        </div>
+      </section>
+
+    </form>
+
+    <section class="panel" id="successPanel" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Servis berhasil disimpan</h2>
+          <p id="successInfo"></p>
+        </div>
+      </div>
+
+      <button class="btn whatsapp" id="sendWhatsApp" type="button">
+        Kirim informasi servis melalui WhatsApp
+      </button>
+    </section>
+
+    <footer>FIXZY • Google Spreadsheet sebagai database utama</footer>
+
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ==========================================================
+   KONFIGURASI API
+   ========================================================== */
+
+const FIXZY_API_URL =
+'https://script.google.com/macros/s/AKfycbx_X4o5bQ6vQPOhMfnXJP6SXYnEguwCP1ULvlRBvvvfRtfv49Do66jy0zDiC9S_-n9k/exec';
+
+const FIXZY_APP_NAME = 'FIXZY';
+
+const $ = selector => document.querySelector(selector);
+
+let productsCache = [];
+let lastSavedService = null;
+
+
+/* ==========================================================
+   UTILITAS
+   ========================================================== */
+
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c]));
+}
+
+function money(value) {
+  return 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+}
+
+function toast(text) {
+  const element = $('#toast');
+  element.textContent = text;
+  element.classList.add('show');
+
+  setTimeout(() => {
+    element.classList.remove('show');
+  }, 3500);
+}
+
+function setMessage(text) {
+  $('#servisMessage').textContent = text;
+}
+
+function apiReady() {
+  return FIXZY_API_URL.startsWith(
+    'https://script.google.com/macros/s/'
+  );
+}
+
+async function apiGet(action) {
+  if (!apiReady()) {
+    throw new Error('URL API FIXZY belum diatur.');
+  }
+
+  const url = new URL(FIXZY_API_URL);
+  url.searchParams.set('action', action);
+
+  const response = await fetch(url);
+  const result = await response.json();
+
+  if (!result.ok) {
+    throw new Error(result.message || 'Permintaan gagal.');
+  }
+
+  return result;
+}
+
+async function apiPost(data) {
+  if (!apiReady()) {
+    throw new Error('URL API FIXZY belum diatur.');
+  }
+
+  const response = await fetch(FIXZY_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify(data)
+  });
+
+  const result = await response.json();
+
+  if (!result.ok) {
+    throw new Error(result.message || 'Penyimpanan gagal.');
+  }
+
+  return result;
+}
+
+
+/* ==========================================================
+   STATUS KONEKSI API
+   ========================================================== */
+
+async function checkApi() {
+  const status = $('#apiStatus');
+
+  try {
+    await apiGet('ping');
+    status.textContent = 'API terhubung';
+    status.className = 'pill ok';
+  } catch (error) {
+    status.textContent = 'API bermasalah';
+    status.className = 'pill bad';
+    console.error(error);
   }
 }
 
 
-/* Aksen tambahan biru dan merah — kuning/hitam tetap menjadi identitas FIXZY */
-.topbar{background:linear-gradient(105deg,#151719 0%,#17191c 72%,#102c48 100%)}
-.topbar{box-shadow:inset 0 -2px 0 var(--yellow)}
-.stat:nth-child(2){border-top-color:var(--blue)}
-.stat:nth-child(3){border-top-color:var(--red)}
-.stat:nth-child(4){border-top-color:var(--blue)}
-.eyebrow{color:var(--blue)}
-.nav:hover{background:var(--blue-soft);color:#164e7a}
-.nav.active{background:linear-gradient(90deg,#fff4c7 0%,#e8f3ff 100%);color:#191a1c;box-shadow:inset 3px 0 var(--yellow)}
-.quick-grid button:hover{border-color:var(--blue);background:var(--blue-soft)}
-.quick-grid b{background:var(--yellow-soft);color:#17191c}
-.btn.primary{background:var(--yellow);color:#17191c;border-bottom:3px solid #d5a900}
-.btn.primary:hover{background:#e9b90d}
-.btn.danger{background:var(--red);color:white}
-.form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1769aa20}
-.tab.active{border-color:var(--blue);color:var(--blue)}
-th{background:#edf4fa}
-.notice{border-color:#f0d87e;background:linear-gradient(110deg,#fffbeb 0%,#fff8f8 100%)}
-.pill.ok{background:#e8f3ff;color:#15558a;border:1px solid #b7d8f6}
-.pill.bad{background:var(--red-soft);color:#a51f28;border:1px solid #f3c1c4}
-.sidebar-note{border-top:2px solid var(--blue)}
-@media(max-width:700px){.topbar{background:linear-gradient(105deg,#151719 0%,#17191c 72%,#102c48 100%)}}
+/* ==========================================================
+   MEMUAT KARYAWAN
+   ========================================================== */
 
-.item-row{display:grid;grid-template-columns:minmax(140px,2fr) minmax(70px,.7fr) minmax(110px,1fr) auto;gap:10px;align-items:end;padding:12px;border:1px solid var(--line,#e5e7eb);border-radius:12px;margin:8px 0;background:#fff}.item-row label{display:block;font-size:12px;color:#666}.item-row input,.item-row select{width:100%;margin-top:5px}.item-row .remove-item{min-height:40px}.item-list{margin-top:10px}@media(max-width:600px){.item-row{grid-template-columns:1fr 1fr}.item-row .item-product{grid-column:1/-1}.item-row .remove-item{grid-column:1/-1}}
+async function loadEmployees() {
+  const select = $('#employeeSelect');
 
-.nav{text-decoration:none}.page{display:block}.main{max-width:1600px}
-</style></head><body><header class="topbar"><a class="brand" href="index.html" style="text-decoration:none;color:inherit"><img class="brand-logo" src="logofixzy.png" alt="Logo FIXZY"><div><b>FIXZY</b><small>PEMBUKUAN SERVIS & PENJUALAN</small></div></a><div class="top-actions"><span id="apiStatus" class="pill muted">Memeriksa API...</span><a class="btn ghost" href="index.html">Dashboard</a></div></header><div class="layout"><aside class="sidebar"><div class="nav-label">MENU UTAMA</div><a class="nav " href="index.html">▦ <span>Dashboard</span></a><a class="nav active" href="servis.html">＋ <span>Input Servis</span></a><a class="nav " href="penjualan.html">▣ <span>Penjualan</span></a><a class="nav " href="stok.html">▤ <span>Stok Produk</span></a><a class="nav " href="pengeluaran.html">↘ <span>Pengeluaran</span></a><a class="nav " href="data.html">☷ <span>Data Transaksi</span></a><a class="nav" href="pengaturan.html">⚙ <span>Pengaturan</span></a><a class="nav" href="karyawan.html">👥 <span>Data Karyawan</span></a><a class="nav" href="absensi.html">🗓 <span>Absensi</span></a><a class="nav" href="upah.html">💰 <span>Upah Bulanan</span></a><div class="sidebar-note"><b>FIXZY PERSONAL</b><small>Owner & karyawan</small></div></aside><main class="main"><section class="page" id="page-servis"><div class="page-head"><div><p class="eyebrow">PELANGGAN & PERANGKAT</p><h1>Input Servis</h1><p class="sub">Nota pelanggan ringkas; rincian modal tersimpan internal.</p></div></div><form id="servisForm" class="panel form-grid"><label>Nama pelanggan *<input name="namaPelanggan" required></label><label>WhatsApp<input name="wa" inputmode="tel"></label><label>Merek / model HP *<input name="model" required placeholder="Contoh: Oppo A16"></label><label>IMEI / serial<input name="imei"></label><label class="span-2">Keluhan *<input name="keluhan" required placeholder="HP mati total, tidak mengisi daya..."></label><label>Biaya jasa (Rp) *<input name="biayaJasa" type="number" min="0" required value="0"></label><label>Teknisi / karyawan<select name="karyawanId" id="employeeSelect"><option value="">Pilih karyawan</option></select></label><label class="span-2">Catatan internal<textarea name="catatan" rows="2"></textarea></label><div class="span-2 form-footer"><button class="btn primary" type="submit">Simpan Servis</button><span class="form-message" id="servisMessage"></span></div></form><div class="panel"><div class="panel-head"><div><h2>Sparepart pada servis</h2><p class="sub">Pilih barang dari stok. Modal disimpan internal dan stok berkurang saat servis disimpan.</p></div><button class="btn small secondary" type="button" id="addServicePart">＋ Tambah sparepart</button></div><div id="serviceParts" class="item-list"><div class="empty">Belum ada sparepart ditambahkan.</div></div></div></section><footer>FIXZY • Google Spreadsheet sebagai database utama</footer></main></div><div id="toast" class="toast"></div><script>const FIXZY_API_URL='';const FIXZY_APP_NAME='FIXZY';</script><script>const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)]; const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID'); let currentTable='servis', productsCache=[];
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function toast(msg){const el=$('#toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
-function apiReady(){return typeof FIXZY_API_URL==='string'&&FIXZY_API_URL.startsWith('https://script.google.com/macros/s/')}
-async function apiGet(action){if(!apiReady())throw Error('URL Apps Script belum diisi.');const u=new URL(FIXZY_API_URL);u.searchParams.set('action',action);const r=await fetch(u);const j=await r.json();if(!j.ok)throw Error(j.message||'Permintaan gagal');return j}
-async function apiPost(data){if(!apiReady())throw Error('URL Apps Script belum diisi.');const r=await fetch(FIXZY_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});const j=await r.json();if(!j.ok)throw Error(j.message||'Permintaan gagal');return j}
-function formObj(f){return Object.fromEntries(new FormData(f).entries())} function message(id,t){const e=$(id);if(e)e.textContent=t}
-async function checkApi(){const s=$('#apiStatus');if(!s)return;try{await apiGet('ping');s.textContent='API terhubung';s.className='pill ok'}catch(e){s.textContent='API belum disetel';s.className='pill bad'}}
+  select.innerHTML = '<option value="">Memuat karyawan...</option>';
 
-function itemRow(kind){const opts=productsCache.map(p=>`<option value="${esc(p['Kode Produk'])}">${esc(p['Kode Produk'])} — ${esc(p['Nama Produk'])} (stok ${esc(p.Stok)})</option>`).join('');return `<div class="item-row"><label class="item-product">Produk<select class="item-code" required><option value="">Pilih produk</option>${opts}</select></label><label>Jumlah<input class="item-qty" type="number" min="1" value="1" required></label><div><small>Modal otomatis</small></div><button class="btn small danger remove-item" type="button">Hapus</button></div>`} async function loadProducts(){productsCache=(await apiGet('stok')).data||[]} $('#addServicePart').addEventListener('click',async()=>{try{if(!productsCache.length)await loadProducts();if(!productsCache.length)throw Error('Stok produk kosong.');if($('#serviceParts').querySelector('.empty'))$('#serviceParts').innerHTML='';$('#serviceParts').insertAdjacentHTML('beforeend',itemRow('service'))}catch(e){message('#servisMessage',e.message)}});document.addEventListener('click',e=>{if(e.target.matches('.remove-item'))e.target.closest('.item-row').remove()});$('#servisForm').addEventListener('submit',async e=>{e.preventDefault();const d=formObj(e.currentTarget);d.action='createservis';d.teknisi=d.karyawanId||'';d.biayaJasa=Number(d.biayaJasa||0);d.spareparts=[...$('#serviceParts').querySelectorAll('.item-row')].map(r=>({kode:r.querySelector('.item-code').value,qty:Number(r.querySelector('.item-qty').value)})).filter(x=>x.kode&&x.qty>0);try{const j=await apiPost(d);message('#servisMessage',`${j.message} No. ${j.idServis}; total ${money(j.totalTagihan)}.`);e.currentTarget.reset();$('#serviceParts').innerHTML='<div class="empty">Belum ada sparepart ditambahkan.</div>';toast('Servis tersimpan')}catch(err){message('#servisMessage',err.message)}});loadEmployees();checkApi();</script></body></html>
+  try {
+    const result = await apiGet('karyawan');
+    const employees = result.data || [];
+
+    select.innerHTML =
+      '<option value="">Pilih teknisi / karyawan</option>';
+
+    employees
+      .filter(employee =>
+        !employee.Status ||
+        String(employee.Status).toLowerCase() === 'aktif'
+      )
+      .forEach(employee => {
+        const option = document.createElement('option');
+
+        option.value = employee.ID;
+        option.textContent = employee.Nama;
+
+        select.appendChild(option);
+      });
+
+    if (!employees.length) {
+      select.innerHTML =
+        '<option value="">Belum ada karyawan aktif</option>';
+    }
+
+  } catch (error) {
+    select.innerHTML =
+      '<option value="">Gagal memuat karyawan</option>';
+
+    console.error(error);
+    setMessage('Gagal memuat karyawan: ' + error.message);
+  }
+}
+
+
+/* ==========================================================
+   MEMUAT PRODUK STOK
+   ========================================================== */
+
+async function loadProducts() {
+  const result = await apiGet('stok');
+
+  productsCache = (result.data || []).filter(product =>
+    String(product['Kode Produk'] || '').trim() !== ''
+  );
+
+  return productsCache;
+}
+
+
+/* ==========================================================
+   BARIS SPAREPART
+   ========================================================== */
+
+function itemRow() {
+  const options = productsCache.map(product => {
+    return `
+      <option value="${esc(product['Kode Produk'])}">
+        ${esc(product['Kode Produk'])} —
+        ${esc(product['Nama Produk'])}
+        (stok ${esc(product.Stok)})
+      </option>
+    `;
+  }).join('');
+
+  return `
+    <div class="item-row">
+      <label class="item-product">
+        Produk
+        <select class="item-code" required>
+          <option value="">Pilih produk</option>
+          ${options}
+        </select>
+      </label>
+
+      <label>
+        Jumlah
+        <input class="item-qty"
+          type="number" min="1" step="1" value="1" required>
+      </label>
+
+      <button class="btn danger remove-item"
+        type="button">Hapus</button>
+    </div>
+  `;
+}
+
+async function addServicePart() {
+  try {
+    if (!productsCache.length) {
+      await loadProducts();
+    }
+
+    if (!productsCache.length) {
+      throw new Error('Belum ada produk pada data stok.');
+    }
+
+    const container = $('#serviceParts');
+
+    if (container.querySelector('.empty')) {
+      container.innerHTML = '';
+    }
+
+    container.insertAdjacentHTML('beforeend', itemRow());
+    updateTotals();
+
+  } catch (error) {
+    setMessage(error.message);
+    toast(error.message);
+  }
+}
+
+$('#addServicePart').addEventListener('click', addServicePart);
+
+$('#serviceParts').addEventListener('click', event => {
+  if (event.target.matches('.remove-item')) {
+    event.target.closest('.item-row').remove();
+
+    if (!$('#serviceParts').querySelector('.item-row')) {
+      $('#serviceParts').innerHTML =
+        '<div class="empty">Belum ada sparepart ditambahkan.</div>';
+    }
+
+    updateTotals();
+  }
+});
+
+$('#serviceParts').addEventListener('change', updateTotals);
+$('#serviceParts').addEventListener('input', updateTotals);
+
+
+/* ==========================================================
+   PERHITUNGAN TAGIHAN
+   ========================================================== */
+
+function getSelectedParts() {
+  return [...$('#serviceParts').querySelectorAll('.item-row')]
+    .map(row => {
+      const code = row.querySelector('.item-code').value;
+      const qty = Number(row.querySelector('.item-qty').value || 0);
+
+      const product = productsCache.find(item =>
+        String(item['Kode Produk']) === String(code)
+      );
+
+      return {
+        kode: code,
+        qty: qty,
+        nama: product ? product['Nama Produk'] : '',
+        harga: product ? Number(product['Harga Jual'] || 0) : 0,
+        stok: product ? Number(product.Stok || 0) : 0
+      };
+    })
+    .filter(item => item.kode && item.qty > 0);
+}
+
+function updateTotals() {
+  const jasa = Number($('#biayaJasa').value || 0);
+  const dibayar = Number($('#dibayar').value || 0);
+
+  const parts = getSelectedParts();
+
+  const totalPart = parts.reduce((sum, part) => {
+    return sum + part.harga * part.qty;
+  }, 0);
+
+  const total = jasa + totalPart;
+  const sisa = Math.max(0, total - dibayar);
+
+  $('#previewJasa').textContent = money(jasa);
+  $('#previewPart').textContent = money(totalPart);
+  $('#previewTotal').textContent = money(total);
+  $('#previewDibayar').textContent = money(dibayar);
+  $('#previewSisa').textContent = money(sisa);
+}
+
+$('#biayaJasa').addEventListener('input', updateTotals);
+$('#dibayar').addEventListener('input', updateTotals);
+
+
+/* ==========================================================
+   RESET FORM
+   ========================================================== */
+
+$('#resetServiceButton').addEventListener('click', () => {
+  if (!confirm('Bersihkan semua isian form servis?')) return;
+
+  $('#servisForm').reset();
+
+  $('#serviceParts').innerHTML =
+    '<div class="empty">Belum ada sparepart ditambahkan.</div>';
+
+  $('#successPanel').hidden = true;
+
+  setMessage('');
+  updateTotals();
+});
+
+
+/* ==========================================================
+   SIMPAN SERVIS
+   ========================================================== */
+
+$('#servisForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const button = $('#saveServiceButton');
+
+  if (button.disabled) return;
+
+  const form = event.currentTarget;
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
+
+  const employeeSelect = $('#employeeSelect');
+  const employeeOption =
+    employeeSelect.options[employeeSelect.selectedIndex];
+
+  data.action = 'createservis';
+
+  data.karyawanId = employeeSelect.value;
+  data.teknisi = employeeOption && employeeSelect.value
+    ? employeeOption.textContent
+    : '';
+
+  data.biayaJasa = Number(data.biayaJasa || 0);
+  data.biayaRisiko = Number(data.biayaRisiko || 0);
+  data.dibayar = Number(data.dibayar || 0);
+
+  data.spareparts = getSelectedParts().map(part => ({
+    kode: part.kode,
+    qty: part.qty
+  }));
+
+  if (!data.namaPelanggan || !data.model || !data.keluhan) {
+    setMessage('Nama pelanggan, model HP, dan keluhan wajib diisi.');
+    return;
+  }
+
+  if (!data.karyawanId) {
+    setMessage('Pilih teknisi atau karyawan terlebih dahulu.');
+    return;
+  }
+
+  if (data.dibayar < 0 || data.biayaJasa < 0 ||
+      data.biayaRisiko < 0) {
+    setMessage('Nominal tidak boleh negatif.');
+    return;
+  }
+
+  const totals = getSelectedParts();
+
+  for (const part of totals) {
+    if (part.qty > part.stok) {
+      setMessage(
+        'Stok ' + part.nama + ' tidak mencukupi. Stok tersedia: ' +
+        part.stok
+      );
+      return;
+    }
+  }
+
+  button.disabled = true;
+  button.textContent = 'Menyimpan...';
+  setMessage('Sedang menyimpan data servis...');
+
+  try {
+    const result = await apiPost(data);
+
+    lastSavedService = {
+      id: result.idServis || '',
+      nama: data.namaPelanggan,
+      wa: data.wa,
+      model: data.model,
+      keluhan: data.keluhan,
+      total: result.total,
+      sisa: result.sisaPiutang
+    };
+
+    $('#successInfo').textContent =
+      'Nomor servis: ' + lastSavedService.id;
+
+    $('#successPanel').hidden = false;
+
+    setMessage(
+      'Servis berhasil disimpan. Nomor: ' +
+      lastSavedService.id
+    );
+
+    toast('Data servis berhasil disimpan.');
+
+    form.reset();
+
+    $('#serviceParts').innerHTML =
+      '<div class="empty">Belum ada sparepart ditambahkan.</div>';
+
+    updateTotals();
+
+    // Muat ulang stok terbaru setelah penyimpanan.
+    productsCache = [];
+    await loadProducts();
+
+  } catch (error) {
+    console.error(error);
+
+    setMessage('Gagal menyimpan servis: ' + error.message);
+    toast(error.message);
+
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Simpan Servis';
+  }
+});
+
+
+/* ==========================================================
+   PESAN WHATSAPP PELANGGAN
+   Tidak menyertakan PIN/pola atau catatan internal.
+   ========================================================== */
+
+$('#sendWhatsApp').addEventListener('click', () => {
+  if (!lastSavedService) {
+    toast('Belum ada servis yang tersimpan.');
+    return;
+  }
+
+  let phone = String(lastSavedService.wa || '')
+    .replace(/\D/g, '');
+
+  if (phone.startsWith('0')) {
+    phone = '62' + phone.substring(1);
+  }
+
+  if (!phone) {
+    toast('Nomor WhatsApp pelanggan belum diisi.');
+    return;
+  }
+
+  const messageText =
+`Halo ${lastSavedService.nama},
+
+Servis HP Anda telah kami catat.
+
+Nomor servis: ${lastSavedService.id}
+Perangkat: ${lastSavedService.model}
+Keluhan: ${lastSavedService.keluhan}
+Estimasi tagihan: ${money(lastSavedService.total)}
+Sisa tagihan: ${money(lastSavedService.sisa)}
+
+Terima kasih telah menggunakan layanan kami.
+FIXZY`;
+
+  const url =
+    'https://wa.me/' + phone +
+    '?text=' + encodeURIComponent(messageText);
+
+  window.open(url, '_blank', 'noopener');
+});
+
+
+/* ==========================================================
+   INISIALISASI
+   ========================================================== */
+
+async function initServisPage() {
+  await Promise.allSettled([
+    checkApi(),
+    loadEmployees(),
+    loadProducts()
+  ]);
+
+  updateTotals();
+}
+
+initServisPage();
+</script>
+
+</body>
+</html>
