@@ -1,0 +1,15 @@
+﻿Nama Sheet,Header (dipisahkan titik koma)
+PENGATURAN,Kunci; Nilai
+SERVIS,ID Servis; Tanggal; Nama Pelanggan; WhatsApp; Merek/Model; IMEI/Serial; Keluhan; Catatan; Teknisi; Status Servis; Biaya Jasa; Total Sparepart; Total Tagihan; Total Dibayar; Sisa Piutang; Modal Sparepart; Laba Kotor Estimasi; Dibuat Oleh; Diperbarui
+DETAIL_JASA,ID Detail; ID Servis; Nama Jasa; Biaya
+DETAIL_SPAREPART,ID Detail; ID Servis; Kode Produk; Nama Produk; Qty; Modal Satuan; Harga Jual Satuan; Subtotal Modal; Subtotal Jual
+PEMBAYARAN,ID Pembayaran; Tanggal; Jenis Transaksi; ID Referensi; Nama Pelanggan; Metode; Nominal; Catatan; Petugas; Status
+STOK,Kode Produk; Nama Produk; Kategori; Merek; Supplier; Stok; Stok Minimum; Modal Satuan; Harga Jual; Aktif; Diperbarui
+PENJUALAN,ID Penjualan; Tanggal; Nama Pelanggan; WhatsApp; Subtotal; Diskon; Total; Total Dibayar; Sisa Piutang; Petugas; Status
+DETAIL_PENJUALAN,ID Detail; ID Penjualan; Kode Produk; Nama Produk; Qty; Modal Satuan; Harga Jual Satuan; Subtotal Modal; Subtotal Jual
+MUTASI_STOK,ID Mutasi; Tanggal; Kode Produk; Nama Produk; Jenis Mutasi; Qty Masuk; Qty Keluar; Referensi; Catatan; Petugas
+PENGELUARAN,ID Pengeluaran; Tanggal; Kategori; Nominal; Metode; Keterangan; Supplier/Penerima; Petugas; Jenis Akuntansi; Status
+KARYAWAN,ID Karyawan; Nama; WhatsApp; Peran; Upah Harian; Aktif
+ABSENSI,ID Absensi; Tanggal; ID Karyawan; Nama; Jam Masuk; Jam Pulang; Status; Catatan
+UPAH,ID Upah; Periode; ID Karyawan; Nama; Hari Hadir; Tarif; Bonus; Potongan; Total; Dibayar; Sisa; Status
+LOG_AKTIVITAS,Waktu; Pengguna; Aksi; Referensi; Keterangan
