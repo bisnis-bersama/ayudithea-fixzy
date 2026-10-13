@@ -1,2 +1,363 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FIXZY | Data Karyawan</title><style>*{box-sizing:border-box}body{margin:0;background:#f4f5f7;color:#202124;font:15px Arial,sans-serif}.top{background:#171717;color:#fff;padding:18px 22px;border-bottom:3px solid #eab308}.top b{color:#facc15;font-size:22px}.layout{display:flex;min-height:calc(100vh - 65px)}aside{width:220px;background:#202020;padding:16px;display:flex;flex-direction:column;gap:8px}aside a{color:#eee;text-decoration:none;padding:11px;border-radius:8px;font-size:14px}aside a:hover,aside a.active{background:#3b3214;color:#ffda46}main{padding:24px;width:100%;max-width:1200px;margin:auto}h1{margin:0 0 6px}.muted{color:#667085;margin:0 0 20px}.card{background:white;border:1px solid #e2e5e9;border-radius:13px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #1018280a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}label{display:block;font-weight:600;font-size:13px;margin-bottom:12px}input,select,textarea{display:block;width:100%;padding:11px;border:1px solid #cbd0d8;border-radius:8px;margin-top:6px;font:inherit;background:#fff}button,.btn{border:0;background:#eab308;color:#171717;padding:11px 16px;border-radius:8px;font-weight:700;cursor:pointer}button.secondary{background:#252525;color:#fff}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}th{background:#f9fafb}.tablewrap{overflow:auto}.status{margin-left:10px;color:#16803d}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}@media(max-width:700px){.layout{display:block}aside{width:100%;flex-direction:row;overflow:auto}aside a{white-space:nowrap}main{padding:14px}}</style></head><body><header class="top"><b>FIXZY</b> <span>• Data Karyawan</span></header><div class="layout"><aside><a href="index.html">▦ Dashboard</a><a href="servis.html">＋ Input Servis</a><a href="penjualan.html">▣ Penjualan</a><a href="stok.html">▤ Stok Produk</a><a href="pengeluaran.html">↘ Pengeluaran</a><a href="data.html">☷ Data Transaksi</a><a href="pengaturan.html">⚙ Pengaturan</a><a href="karyawan.html">👥 Data Karyawan</a><a href="absensi.html">🗓 Absensi</a><a href="upah.html">💰 Upah Bulanan</a></aside><main><h1>Data Karyawan</h1><p class="muted">Tambahkan karyawan dan tentukan upah hariannya. Nama akan tersedia di servis, penjualan, dan pengeluaran.</p><form id="f" class="card grid"><input type="hidden" name="id"><label>Nama karyawan *<input name="nama" required></label><label>Nomor HP<input name="telepon"></label><label>Jabatan<input name="jabatan" placeholder="Teknisi / kasir"></label><label>Upah per hari (Rp) *<input name="upahHarian" type="number" min="0" required value="0"></label><label>Status<select name="status"><option>Aktif</option><option>Nonaktif</option></select></label><div><button type="submit">Simpan Karyawan</button> <button type="button" class="secondary" onclick="$('#f').reset()">Bersihkan</button><span id="msg" class="status"></span></div></form><section class="card"><div class="row"><h2 style="margin-right:auto">Daftar Karyawan</h2><button onclick="loadRows()" type="button">Muat ulang</button></div><div class="tablewrap"><table><thead><tr><th>Nama</th><th>Jabatan</th><th>Upah/hari</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="rows"></tbody></table></div></section></main></div><script>const FIXZY_API_URL='';const $=s=>document.querySelector(s);const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');async function get(a){if(!FIXZY_API_URL)throw Error('Isi URL Apps Script pada konstanta FIXZY_API_URL.');let u=new URL(FIXZY_API_URL);u.searchParams.set('action',a);let r=await fetch(u);let j=await r.json();if(!j.ok)throw Error(j.message||'Gagal');return j}async function post(d){if(!FIXZY_API_URL)throw Error('Isi URL Apps Script pada konstanta FIXZY_API_URL.');let r=await fetch(FIXZY_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)});let j=await r.json();if(!j.ok)throw Error(j.message||'Gagal');return j}function msg(t){$('#msg').textContent=t}
-let cache=[];async function loadRows(){{try{{let j=await get('karyawan');cache=j.data||[];$('#rows').innerHTML=cache.map((x,i)=>`<tr><td>${{x.Nama||''}}</td><td>${{x.Jabatan||''}}</td><td>${{money(x['Upah Harian'])}}</td><td>${{x.Status||'Aktif'}}</td><td><button type="button" onclick="editRow(${{i}})">Edit</button></td></tr>`).join('')||'<tr><td colspan="5">Belum ada karyawan.</td></tr>'}}catch(e){{msg(e.message)}}}}window.editRow=i=>{{let x=cache[i];let f=$('#f');f.elements.id.value=x.ID||'';f.elements.nama.value=x.Nama||'';f.elements.telepon.value=x.Telepon||'';f.elements.jabatan.value=x.Jabatan||'';f.elements.upahHarian.value=x['Upah Harian']||0;f.elements.status.value=x.Status||'Aktif';window.scrollTo(0,0)}};$('#f').onsubmit=async e=>{{e.preventDefault();try{{let d=Object.fromEntries(new FormData(e.target));d.action='savekaryawan';let j=await post(d);msg(j.message);e.target.reset();await loadRows()}}catch(x){{msg(x.message)}}}};loadRows();</script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIXZY | Data Karyawan</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f5f7;color:#202124;font:15px Arial,sans-serif}
+.top{background:#171717;color:#fff;padding:18px 22px;border-bottom:3px solid #eab308}
+.top b{color:#facc15;font-size:22px}
+.layout{display:flex;min-height:calc(100vh - 65px)}
+aside{width:220px;background:#202020;padding:16px;display:flex;flex-direction:column;gap:8px}
+aside a{color:#eee;text-decoration:none;padding:11px;border-radius:8px;font-size:14px}
+aside a:hover,aside a.active{background:#3b3214;color:#ffda46}
+main{padding:24px;width:100%;max-width:1200px;margin:auto}
+h1{margin:0 0 6px}
+.muted{color:#667085;margin:0 0 20px}
+.card{background:white;border:1px solid #e2e5e9;border-radius:13px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #1018280a}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+label{display:block;font-weight:600;font-size:13px;margin-bottom:12px}
+input,select{display:block;width:100%;padding:11px;border:1px solid #cbd0d8;border-radius:8px;margin-top:6px;font:inherit;background:#fff}
+button,.btn{border:0;background:#eab308;color:#171717;padding:11px 16px;border-radius:8px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+button.secondary{background:#252525;color:#fff}
+button.edit{padding:7px 10px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
+th{background:#f9fafb}
+.tablewrap{overflow:auto}
+.status{display:block;margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.status.ok{color:#16803d}
+.status.err{color:#b42318}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.api-info{font-size:12px;color:#667085;margin-top:8px}
+@media(max-width:700px){
+ .layout{display:block}
+ aside{width:100%;flex-direction:row;overflow:auto}
+ aside a{white-space:nowrap}
+ main{padding:14px}
+}
+</style>
+</head>
+
+<body>
+<header class="top">
+  <b>FIXZY</b> <span>• Data Karyawan</span>
+</header>
+
+<div class="layout">
+<aside>
+  <a href="index.html">▦ Dashboard</a>
+  <a href="servis.html">＋ Input Servis</a>
+  <a href="penjualan.html">▣ Penjualan</a>
+  <a href="stok.html">▤ Stok Produk</a>
+  <a href="pengeluaran.html">↘ Pengeluaran</a>
+  <a href="data.html">☷ Data Transaksi</a>
+  <a href="pengaturan.html">⚙ Pengaturan</a>
+  <a href="karyawan.html" class="active">👥 Data Karyawan</a>
+  <a href="absensi.html">🗓 Absensi</a>
+  <a href="upah.html">💰 Upah Bulanan</a>
+</aside>
+
+<main>
+  <h1>Data Karyawan</h1>
+  <p class="muted">
+    Tambahkan karyawan dan tentukan upah hariannya.
+    Nama akan tersedia di servis, penjualan, dan pengeluaran.
+  </p>
+
+  <section class="card">
+    <form id="f" class="grid">
+      <input type="hidden" name="id">
+
+      <label>
+        Nama karyawan *
+        <input name="nama" required maxlength="150">
+      </label>
+
+      <label>
+        Nomor HP
+        <input name="telepon" type="tel" maxlength="30">
+      </label>
+
+      <label>
+        Jabatan
+        <input name="jabatan" placeholder="Teknisi / kasir" maxlength="100">
+      </label>
+
+      <label>
+        Upah per hari (Rp) *
+        <input name="upahHarian" type="number" min="0" step="1" required value="0">
+      </label>
+
+      <label>
+        Status
+        <select name="status">
+          <option value="Aktif">Aktif</option>
+          <option value="Nonaktif">Nonaktif</option>
+        </select>
+      </label>
+
+      <div>
+        <button id="saveBtn" type="submit">Simpan Karyawan</button>
+        <button type="button" class="secondary" id="clearBtn">Bersihkan</button>
+        <div id="msg" class="status" role="status" aria-live="polite"></div>
+      </div>
+    </form>
+
+    <div class="api-info">Database: Google Spreadsheet FIXZY</div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <h2 style="margin-right:auto">Daftar Karyawan</h2>
+      <button id="reloadBtn" type="button">Muat ulang</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Nomor HP</th>
+            <th>Jabatan</th>
+            <th>Upah/hari</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="6">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+'use strict';
+
+/* URL Web App Apps Script FIXZY */
+const FIXZY_API_URL =
+  'https://script.google.com/macros/s/AKfycbx_X4o5bQ6vQPOhMfnXJP6SXYnEguwCP1ULvlRBvvvfRtfv49Do66jy0zDiC9S_-n9k/exec';
+
+const $ = selector => document.querySelector(selector);
+const form = $('#f');
+const saveBtn = $('#saveBtn');
+const rowsEl = $('#rows');
+
+let cache = [];
+let saving = false;
+
+function money(value) {
+  return 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+}
+
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[char]);
+}
+
+function showMessage(text, type = '') {
+  const el = $('#msg');
+  el.textContent = text;
+  el.className = 'status' + (type ? ' ' + type : '');
+}
+
+async function get(action) {
+  const url = new URL(FIXZY_API_URL);
+  url.searchParams.set('action', action);
+
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    cache: 'no-store'
+  });
+
+  if (!response.ok) {
+    throw new Error('Permintaan gagal. HTTP ' + response.status);
+  }
+
+  const result = await response.json();
+
+  if (!result.ok) {
+    throw new Error(result.message || 'Gagal mengambil data.');
+  }
+
+  return result;
+}
+
+async function post(data) {
+  const response = await fetch(FIXZY_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    throw new Error('Pengiriman gagal. HTTP ' + response.status);
+  }
+
+  const result = await response.json();
+
+  if (!result.ok) {
+    throw new Error(result.message || 'Data gagal disimpan.');
+  }
+
+  return result;
+}
+
+async function loadRows() {
+  $('#reloadBtn').disabled = true;
+  rowsEl.innerHTML =
+    '<tr><td colspan="6">Memuat data karyawan...</td></tr>';
+
+  try {
+    const result = await get('karyawan');
+    cache = Array.isArray(result.data) ? result.data : [];
+
+    if (cache.length === 0) {
+      rowsEl.innerHTML =
+        '<tr><td colspan="6">Belum ada karyawan.</td></tr>';
+      return;
+    }
+
+    rowsEl.innerHTML = cache.map((item, index) => `
+      <tr>
+        <td>${escapeHTML(item.Nama)}</td>
+        <td>${escapeHTML(item.Telepon)}</td>
+        <td>${escapeHTML(item.Jabatan)}</td>
+        <td>${money(item['Upah Harian'])}</td>
+        <td>${escapeHTML(item.Status || 'Aktif')}</td>
+        <td>
+          <button class="edit" type="button"
+            data-edit="${index}">Edit</button>
+        </td>
+      </tr>
+    `).join('');
+
+  } catch (error) {
+    rowsEl.innerHTML =
+      '<tr><td colspan="6">Gagal memuat data. Periksa koneksi API.</td></tr>';
+    showMessage('Gagal memuat data: ' + error.message, 'err');
+  } finally {
+    $('#reloadBtn').disabled = false;
+  }
+}
+
+function editRow(index) {
+  const item = cache[index];
+  if (!item) return;
+
+  form.elements.id.value = item.ID || '';
+  form.elements.nama.value = item.Nama || '';
+  form.elements.telepon.value = item.Telepon || '';
+  form.elements.jabatan.value = item.Jabatan || '';
+  form.elements.upahHarian.value = item['Upah Harian'] ?? 0;
+  form.elements.status.value = item.Status || 'Aktif';
+
+  saveBtn.textContent = 'Simpan Perubahan';
+  showMessage('Mode edit: ' + item.Nama, 'ok');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+rowsEl.addEventListener('click', event => {
+  const button = event.target.closest('[data-edit]');
+  if (!button) return;
+
+  editRow(Number(button.dataset.edit));
+});
+
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+
+  if (saving) return;
+
+  const nama = form.elements.nama.value.trim();
+  const upah = Number(form.elements.upahHarian.value);
+
+  if (!nama) {
+    showMessage('Nama karyawan wajib diisi.', 'err');
+    return;
+  }
+
+  if (!Number.isFinite(upah) || upah < 0) {
+    showMessage('Upah harian harus berupa angka nol atau lebih.', 'err');
+    return;
+  }
+
+  const data = Object.fromEntries(new FormData(form).entries());
+
+  data.action = 'savekaryawan';
+  data.nama = nama;
+  data.telepon = data.telepon.trim();
+  data.jabatan = data.jabatan.trim();
+  data.upahHarian = upah;
+
+  saving = true;
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Menyimpan...';
+  showMessage('Mengirim data ke Spreadsheet...');
+
+  try {
+    const result = await post(data);
+
+    showMessage(
+      (result.message || 'Data tersimpan.') +
+      '. Memuat ulang daftar karyawan...',
+      'ok'
+    );
+
+    form.reset();
+    form.elements.id.value = '';
+    saveBtn.textContent = 'Simpan Karyawan';
+
+    await loadRows();
+
+    showMessage(
+      'Respons API berhasil: ' +
+      (result.message || 'Data tersimpan.') +
+      ' Periksa daftar karyawan dan tab Karyawan di Spreadsheet.',
+      'ok'
+    );
+
+  } catch (error) {
+    showMessage(
+      'Gagal menyimpan: ' + error.message +
+      '. Periksa izin Web App, URL API, dan log eksekusi Apps Script.',
+      'err'
+    );
+  } finally {
+    saving = false;
+    saveBtn.disabled = false;
+    saveBtn.textContent = form.elements.id.value
+      ? 'Simpan Perubahan'
+      : 'Simpan Karyawan';
+  }
+});
+
+$('#clearBtn').addEventListener('click', () => {
+  form.reset();
+  form.elements.id.value = '';
+  saveBtn.textContent = 'Simpan Karyawan';
+  showMessage('');
+});
+
+$('#reloadBtn').addEventListener('click', loadRows);
+
+/* Memuat daftar saat halaman dibuka */
+loadRows();
+</script>
+</body>
+</html>
