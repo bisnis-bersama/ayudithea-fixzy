@@ -42,25 +42,18 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:point
 <div class="scroll"><table><thead><tr><th>ID / Tanggal</th><th>Pelanggan / WhatsApp</th><th>Perangkat / Keluhan</th><th>Total</th><th>Dibayar</th><th>Sisa</th><th>Pembayaran</th><th>Pengerjaan</th><th>Pengembalian DP</th><th>Aksi</th></tr></thead><tbody id="tbody"><tr><td colspan="10" class="loading">Memuat data...</td></tr></tbody></table></div>
 </section>
 </main>
-
 <div class="modal" id="detailModal"><div class="dialog"><div class="dialog-head"><h3>Detail Servis</h3><button class="x" onclick="closeModal('detailModal')">×</button></div><div class="dialog-body" id="detailBody"></div><div class="dialog-actions"><button class="light" onclick="closeModal('detailModal')">Tutup</button></div></div></div>
-
 <div class="modal" id="statusModal"><div class="dialog"><div class="dialog-head"><h3>Ubah Status Pengerjaan</h3><button class="x" onclick="closeModal('statusModal')">×</button></div><div class="dialog-body">
-<input type="hidden" id="statusId">
-<div class="form-grid">
+<input type="hidden" id="statusId"><div class="form-grid">
 <div class="field full"><label>Status pengerjaan</label><select id="workStatus"><option value="Masuk">Masuk</option><option value="Menunggu Sparepart">Menunggu Sparepart</option><option value="Proses">Proses</option><option value="Selesai">Selesai</option><option value="Sudah Diambil">Sudah Diambil</option><option value="Dibatalkan">Dibatalkan</option></select></div>
 <div class="field full"><label>Catatan pengerjaan</label><textarea id="workNote" rows="3" placeholder="Catatan teknisi / alasan pembatalan"></textarea></div>
 </div><p class="hint">Pilih “Sudah Diambil” setelah perangkat benar-benar diserahkan kepada pelanggan. Status ini otomatis membuat pembayaran tercatat lunas. Jika servis dibatalkan, pengembalian uang harus dicatat setelah benar-benar dibayarkan.</p>
 </div><div class="dialog-actions"><button class="light" onclick="closeModal('statusModal')">Batal</button><button class="primary" onclick="saveWorkStatus()">Simpan Status</button></div></div></div>
-
-
-
 <div class="modal" id="refundModal"><div class="dialog"><div class="dialog-head"><h3>Catat Pengembalian DP</h3><button class="x" onclick="closeModal('refundModal')">×</button></div><div class="dialog-body">
 <input type="hidden" id="refundId"><div id="refundInfo" class="hint" style="margin-bottom:12px"></div>
 <div class="form-grid"><div class="field"><label>Nominal pengembalian (Rp)</label><input id="refundAmount" type="number" min="1" step="1"></div><div class="field"><label>Metode</label><select id="refundMethod"><option>Tunai</option><option>Transfer</option><option>QRIS</option><option>Lainnya</option></select></div><div class="field full"><label>Catatan</label><input id="refundNote" placeholder="Nomor referensi transfer / keterangan"></div></div>
 <p class="hint" style="color:#a21e1e">Penting: catat pengembalian hanya setelah uang benar-benar diberikan kepada pelanggan. Jangan klik simpan jika pengembalian belum dilakukan.</p>
 </div><div class="dialog-actions"><button class="light" onclick="closeModal('refundModal')">Batal</button><button class="red" onclick="saveRefund()">Konfirmasi Pengembalian</button></div></div></div>
-
 <script>
 const API='https://script.google.com/macros/s/AKfycbx_X4o5bQ6vQPOhMfnXJP6SXYnEguwCP1ULvlRBvvvfRtfv49Do66jy0zDiC9S_-n9k/exec';
 let data=[],busy=false;
@@ -73,7 +66,7 @@ function work(x){return String(val(x,'Status Pengerjaan','Status Pengerjaan Serv
 function payStatus(x){return String(val(x,'Status')|| (num(val(x,'Sisa Piutang'))<=0?'Lunas':'Belum Lunas'))}
 function total(x){return num(val(x,'Total Tagihan','Total'))}
 function paid(x){return num(val(x,'Dibayar'))}
-function remain(x){return Math.max(0,num(val(x,'Sisa Piutang', 'Sisa Piutang Servis')) || (total(x)-paid(x)))}
+function remain(x){const raw=val(x,'Sisa Piutang','Sisa Piutang Servis');if(norm(work(x))==='dibatalkan')return 0;if(raw!==''&&raw!==null&&raw!==undefined)return Math.max(0,num(raw));return Math.max(0,total(x)-paid(x))}
 function refundStatus(x){return String(val(x,'Status Pengembalian DP','Status Pengembalian','statusPengembalianDP')||'Belum Dikembalikan')}
 function norm(s){return String(s||'').toLowerCase().trim()}
 function badge(text,kind){return `<span class="badge b-${kind}">${esc(text)}</span>`}
@@ -102,7 +95,36 @@ async function saveWorkStatus(){const id=$('statusId').value,status=$('workStatu
 function numInput(v){const n=Number(v);return Number.isFinite(n)?n:0}
 function openRefund(id){const x=find(id);if(!x)return;if(norm(work(x))!=='dibatalkan'){notice('Pengembalian hanya tersedia untuk servis yang dibatalkan.',true);return}if(norm(refundStatus(x)).includes('sudah')||norm(refundStatus(x))==='dikembalikan'){notice('Pengembalian sudah tercatat.',true);return}$('refundId').value=id;$('refundAmount').value=paid(x);$('refundAmount').max=paid(x);$('refundNote').value='';$('refundInfo').textContent=`${val(x,'Nama Pelanggan')} • Uang diterima tercatat ${money(paid(x))}. Backend harus mencatat pengembalian secara penuh.`;$('refundModal').classList.add('show')}
 async function saveRefund(){const id=$('refundId').value,x=find(id),nominal=numInput($('refundAmount').value);if(!x)return;if(nominal!==paid(x)){notice('Nominal pengembalian harus sama dengan total uang yang tercatat diterima: '+money(paid(x)),true);return}if(!confirm('Pastikan uang benar-benar sudah dikembalikan kepada pelanggan. Simpan pencatatan pengembalian sekarang?'))return;try{const j=await post({action:'kembalikanDP',idServis:id,nominal,metode:$('refundMethod').value,catatan:$('refundNote').value});closeModal('refundModal');notice(j.message||'Pengembalian dicatat.');await loadData()}catch(e){notice('Pengembalian gagal: '+e.message,true)}}
-function whatsapp(id){const x=find(id);if(!x)return;const phone=String(val(x,'WhatsApp')).replace(/\D/g,'').replace(/^0/,'62');if(!phone){notice('Nomor WhatsApp tidak tersedia.',true);return}const msg=`Halo ${val(x,'Nama Pelanggan')||'Kak'}, informasi servis FIXZY:\nID Servis: ${val(x,'ID Servis')}\nHP: ${val(x,'Model HP')}\nStatus pengerjaan: ${work(x)}\nTotal tagihan: ${money(total(x))}\nSudah dibayar: ${money(paid(x))}\nSisa tagihan: ${money(remain(x))}\nTerima kasih.`;window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank','noopener')}
+function normalizeWhatsApp(raw){
+  let p=String(raw??'').trim();
+  if(!p)return '';
+  // Buang ekstensi umum sebelum normalisasi.
+  p=p.replace(/(?:ext\.?|extension|x)\s*\d+$/i,'').replace(/[^\d+]/g,'');
+  // Tanda + hanya boleh berada di awal.
+  p=p.replace(/(?!^)\+/g,'');
+  if(p.startsWith('+'))p=p.slice(1);
+  if(p.startsWith('00'))p=p.slice(2);
+  // Format lokal Indonesia: 08xxx -> 628xxx, 8xxx -> 628xxx.
+  if(p.startsWith('0'))p='62'+p.slice(1);
+  else if(p.startsWith('8'))p='62'+p;
+  // Nomor Indonesia yang sudah memakai kode negara tetap dipertahankan.
+  // Jangan mengubah kode negara asing menjadi Indonesia secara otomatis.
+  if(!/^\d{8,15}$/.test(p))return '';
+  return p;
+}
+function whatsapp(id){
+  const x=find(id);if(!x)return;
+  const raw=val(x,'WhatsApp','No WhatsApp','Nomor WhatsApp','No. WhatsApp','Telepon','No HP','Nomor HP');
+  const phone=normalizeWhatsApp(raw);
+  if(!phone){
+    notice('Nomor WhatsApp pelanggan kosong atau formatnya tidak valid. Periksa kolom WhatsApp pada data servis: '+String(raw||'(kosong)'),true);
+    return;
+  }
+  const msg=`Halo ${val(x,'Nama Pelanggan')||'Kak'}, informasi servis FIXZY:\nID Servis: ${val(x,'ID Servis')}\nHP: ${val(x,'Model HP')}\nStatus pengerjaan: ${work(x)}\nTotal tagihan: ${money(total(x))}\nSudah dibayar: ${money(paid(x))}\nSisa tagihan: ${money(remain(x))}\nTerima kasih.`;
+  const url='https://wa.me/'+phone+'?text='+encodeURIComponent(msg);
+  // Navigasi langsung dari klik pengguna agar tidak diblokir pemblokir popup di ponsel.
+  window.location.href=url;
+}
 function closeModal(id){$(id).classList.remove('show')}
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
 loadData();
