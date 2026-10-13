@@ -1,0 +1,1 @@
+FIXZY multi-halaman. File: index.html, servis.html, penjualan.html, stok.html, pengeluaran.html, data.html. Simpan semua di folder/repository yang sama dengan logofixzy.png. Isi FIXZY_API_URL di setiap halaman dengan URL deployment Google Apps Script. Ini kerangka awal; endpoint backend harus sesuai dan diuji sebelum transaksi nyata.
