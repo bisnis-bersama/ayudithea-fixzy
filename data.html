@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#171717">
 <title>FIXZY | Data Servis</title>
 
 <style>
 :root{
   --yellow:#f5c400;
-  --yellow2:#ffe36a;
+  --yellow-light:#fff3b0;
   --black:#171717;
-  --dark:#222;
+  --dark:#252525;
   --white:#fff;
   --bg:#f3f4f6;
   --gray:#737373;
@@ -20,9 +21,7 @@
   --border:#e5e7eb;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -31,18 +30,14 @@ body{
   color:#222;
 }
 
-button,input,select,textarea{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
 
 .topbar{
   background:var(--black);
   color:white;
-  padding:15px 20px;
+  padding:12px 20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -54,20 +49,16 @@ button{
 .brand{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:12px;
+  min-width:0;
 }
 
-.logo{
-  width:45px;
-  height:45px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:var(--yellow);
-  color:#111;
-  border-radius:12px;
-  font-size:20px;
-  font-weight:900;
+.logo-img{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+  border-radius:10px;
+  background:#171717;
 }
 
 .brand-name{
@@ -79,13 +70,14 @@ button{
 .brand-sub{
   font-size:11px;
   color:#ddd;
-  margin-top:3px;
+  margin-top:4px;
 }
 
 .top-actions{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
+  align-items:center;
 }
 
 .btn{
@@ -93,38 +85,15 @@ button{
   border-radius:9px;
   padding:10px 14px;
   font-weight:700;
-  transition:.2s;
+  transition:.15s;
 }
 
-.btn:hover{
-  opacity:.88;
-}
-
-.btn-yellow{
-  background:var(--yellow);
-  color:#171717;
-}
-
-.btn-dark{
-  background:#292929;
-  color:white;
-}
-
-.btn-blue{
-  background:var(--blue);
-  color:white;
-}
-
-.btn-green{
-  background:var(--green);
-  color:white;
-}
-
-.btn-red{
-  background:var(--red);
-  color:white;
-}
-
+.btn:hover{opacity:.88}
+.btn-yellow{background:var(--yellow);color:#171717}
+.btn-dark{background:#292929;color:white}
+.btn-blue{background:var(--blue);color:white}
+.btn-green{background:var(--green);color:white}
+.btn-red{background:var(--red);color:white}
 .btn-light{
   background:#f1f5f9;
   color:#222;
@@ -182,13 +151,8 @@ button{
   background:#aaa;
 }
 
-.dot.online{
-  background:#16a34a;
-}
-
-.dot.offline{
-  background:#dc2626;
-}
+.dot.online{background:#16a34a}
+.dot.offline{background:#dc2626}
 
 .summary{
   display:grid;
@@ -217,17 +181,9 @@ button{
   background:var(--yellow);
 }
 
-.summary-card:nth-child(2):before{
-  background:var(--green);
-}
-
-.summary-card:nth-child(3):before{
-  background:var(--blue);
-}
-
-.summary-card:nth-child(4):before{
-  background:var(--red);
-}
+.summary-card:nth-child(2):before{background:var(--green)}
+.summary-card:nth-child(3):before{background:var(--blue)}
+.summary-card:nth-child(4):before{background:var(--red)}
 
 .summary-label{
   color:var(--gray);
@@ -266,13 +222,12 @@ button{
   font-size:17px;
 }
 
-.panel-body{
-  padding:18px;
-}
+.panel-body{padding:18px}
 
 .filters{
   display:grid;
-  grid-template-columns:minmax(180px,2fr) minmax(150px,1fr) minmax(150px,1fr) auto;
+  grid-template-columns:minmax(180px,2fr) minmax(150px,1fr)
+    minmax(150px,1fr) auto;
   gap:10px;
   align-items:end;
 }
@@ -295,6 +250,11 @@ button{
   background:white;
 }
 
+.field textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
 .field input:focus,
 .field select:focus,
 .field textarea:focus{
@@ -310,7 +270,7 @@ button{
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:1050px;
+  min-width:1250px;
 }
 
 th{
@@ -329,9 +289,7 @@ td{
   vertical-align:top;
 }
 
-tbody tr:hover{
-  background:#fffdf2;
-}
+tbody tr:hover{background:#fffdf2}
 
 .customer-name{
   font-weight:800;
@@ -342,6 +300,7 @@ tbody tr:hover{
   color:var(--gray);
   font-size:11px;
   margin-top:4px;
+  line-height:1.5;
 }
 
 .money{
@@ -358,26 +317,17 @@ tbody tr:hover{
   white-space:nowrap;
 }
 
-.badge-green{
-  background:#dcfce7;
-  color:#166534;
-}
-
-.badge-red{
-  background:#fee2e2;
-  color:#991b1b;
-}
-
-.badge-yellow{
-  background:#fef3c7;
-  color:#92400e;
-}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-yellow{background:#fef3c7;color:#92400e}
+.badge-blue{background:#dbeafe;color:#1d4ed8}
+.badge-gray{background:#e5e7eb;color:#374151}
 
 .actions{
   display:flex;
   gap:6px;
   flex-wrap:wrap;
-  min-width:150px;
+  min-width:220px;
 }
 
 .empty{
@@ -415,9 +365,7 @@ tbody tr:hover{
   justify-content:center;
 }
 
-.modal.show{
-  display:flex;
-}
+.modal.show{display:flex}
 
 .modal-card{
   width:min(560px,100%);
@@ -436,6 +384,7 @@ tbody tr:hover{
   justify-content:space-between;
   align-items:center;
   border-bottom:4px solid var(--yellow);
+  gap:12px;
 }
 
 .modal-head h3{
@@ -447,12 +396,11 @@ tbody tr:hover{
   background:transparent;
   color:white;
   border:0;
-  font-size:25px;
+  font-size:27px;
+  line-height:1;
 }
 
-.modal-body{
-  padding:20px;
-}
+.modal-body{padding:20px}
 
 .modal-footer{
   display:flex;
@@ -475,12 +423,13 @@ tbody tr:hover{
   display:flex;
   justify-content:space-between;
   gap:10px;
-  padding:6px 0;
+  padding:7px 0;
   font-size:13px;
 }
 
 .detail-row strong{
   text-align:right;
+  overflow-wrap:anywhere;
 }
 
 .form-grid{
@@ -489,9 +438,7 @@ tbody tr:hover{
   gap:12px;
 }
 
-.full{
-  grid-column:1/-1;
-}
+.full{grid-column:1/-1}
 
 .notice{
   padding:12px;
@@ -499,7 +446,7 @@ tbody tr:hover{
   border:1px solid #f3d66b;
   border-radius:9px;
   font-size:12px;
-  line-height:1.5;
+  line-height:1.6;
   margin-bottom:15px;
 }
 
@@ -517,66 +464,44 @@ tbody tr:hover{
   max-width:90%;
   display:none;
   font-size:13px;
+  line-height:1.5;
 }
 
-.toast.show{
-  display:block;
+.toast.show{display:block}
+
+.status-current{
+  display:inline-block;
+  padding:8px 11px;
+  background:#fff7d6;
+  border-radius:9px;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:14px;
 }
 
 @media(max-width:900px){
-  .summary{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .filters{
-    grid-template-columns:1fr 1fr;
-  }
+  .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .filters{grid-template-columns:1fr 1fr}
 }
 
 @media(max-width:560px){
-  .container{
-    padding:12px;
-  }
-
-  .topbar{
-    padding:12px;
-  }
-
-  .brand-name{
-    font-size:20px;
-  }
-
-  .page-heading h1{
-    font-size:22px;
-  }
-
-  .summary{
-    gap:9px;
-  }
-
-  .summary-card{
-    padding:13px;
-  }
-
-  .summary-value{
-    font-size:17px;
-  }
-
-  .filters{
-    grid-template-columns:1fr;
-  }
-
-  .form-grid{
-    grid-template-columns:1fr;
-  }
-
-  .full{
-    grid-column:auto;
-  }
-
-  .panel-body{
-    padding:12px;
-  }
+  .container{padding:12px}
+  .topbar{padding:12px}
+  .brand-name{font-size:20px}
+  .brand-sub{font-size:10px}
+  .logo-img{width:42px;height:42px}
+  .page-heading h1{font-size:22px}
+  .summary{gap:9px}
+  .summary-card{padding:13px}
+  .summary-value{font-size:17px}
+  .filters{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .full{grid-column:auto}
+  .panel-body{padding:12px}
+  .modal{padding:8px}
+  .modal-body{padding:15px}
+  .modal-footer{padding:12px 15px}
+  .top-actions .btn{padding:9px 11px}
 }
 
 @media print{
@@ -584,27 +509,15 @@ tbody tr:hover{
   .filters,
   .actions,
   .pagination,
-  .no-print{
+  .no-print,
+  .api-status{
     display:none!important;
   }
 
-  body{
-    background:white;
-  }
-
-  .container{
-    padding:0;
-    width:100%;
-  }
-
-  .panel,
-  .summary-card{
-    box-shadow:none;
-  }
-
-  table{
-    min-width:0;
-  }
+  body{background:white}
+  .container{padding:0;width:100%}
+  .panel,.summary-card{box-shadow:none}
+  table{min-width:0}
 }
 </style>
 </head>
@@ -613,7 +526,12 @@ tbody tr:hover{
 
 <header class="topbar">
   <div class="brand">
-    <div class="logo">F</div>
+    <img
+      class="logo-img"
+      src="logofixzy.png"
+      alt="Logo FIXZY"
+      onerror="this.style.display='none'"
+    >
     <div>
       <div class="brand-name">FIXZY</div>
       <div class="brand-sub">PEMBUKUAN CERDAS • DATA SERVIS</div>
@@ -624,7 +542,6 @@ tbody tr:hover{
     <button class="btn btn-yellow" onclick="loadData()">
       ↻ Refresh
     </button>
-
     <button class="btn btn-dark" onclick="window.print()">
       Cetak
     </button>
@@ -636,7 +553,7 @@ tbody tr:hover{
   <section class="page-heading">
     <div>
       <h1>Data Servis</h1>
-      <p>Pantau transaksi servis, pembayaran, dan piutang pelanggan.</p>
+      <p>Pantau transaksi, pengerjaan, pembayaran, dan piutang pelanggan.</p>
     </div>
 
     <div class="api-status">
@@ -644,7 +561,6 @@ tbody tr:hover{
       <span id="apiText">Memeriksa koneksi...</span>
     </div>
   </section>
-
 
   <section class="summary">
     <div class="summary-card">
@@ -668,7 +584,6 @@ tbody tr:hover{
     </div>
   </section>
 
-
   <section class="panel">
     <div class="panel-head">
       <h2>🔎 Pencarian Data Servis</h2>
@@ -677,7 +592,6 @@ tbody tr:hover{
 
     <div class="panel-body">
       <div class="filters">
-
         <div class="field">
           <label for="search">Cari Servis</label>
           <input
@@ -699,31 +613,20 @@ tbody tr:hover{
 
         <div class="field">
           <label for="filterBulan">Bulan Servis</label>
-          <input
-            id="filterBulan"
-            type="month"
-            onchange="applyFilters()"
-          >
+          <input id="filterBulan" type="month" onchange="applyFilters()">
         </div>
 
         <button class="btn btn-yellow" onclick="resetFilters()">
           Reset Filter
         </button>
-
       </div>
     </div>
   </section>
 
-
   <section class="panel">
     <div class="panel-head">
       <h2>📋 Daftar Servis</h2>
-
-      <div>
-        <span class="badge badge-yellow" id="jumlahTampil">
-          0 data
-        </span>
-      </div>
+      <span class="badge badge-yellow" id="jumlahTampil">0 data</span>
     </div>
 
     <div class="table-wrap">
@@ -739,15 +642,14 @@ tbody tr:hover{
             <th>Dibayar</th>
             <th>Sisa Piutang</th>
             <th>Status Bayar</th>
+            <th>Status Pengerjaan</th>
             <th>Aksi</th>
           </tr>
         </thead>
 
         <tbody id="tableBody">
           <tr>
-            <td colspan="10" class="loading">
-              Memuat data servis...
-            </td>
+            <td colspan="11" class="loading">Memuat data servis...</td>
           </tr>
         </tbody>
       </table>
@@ -755,12 +657,10 @@ tbody tr:hover{
 
     <div class="pagination">
       <span id="pageInfo">Halaman 1</span>
-
       <div class="top-actions">
         <button class="btn btn-light btn-small" onclick="changePage(-1)">
           ← Sebelumnya
         </button>
-
         <button class="btn btn-light btn-small" onclick="changePage(1)">
           Berikutnya →
         </button>
@@ -768,11 +668,9 @@ tbody tr:hover{
     </div>
   </section>
 
-
   <section class="panel">
     <div class="panel-head">
       <h2>🧾 Riwayat Pembayaran</h2>
-
       <button class="btn btn-yellow btn-small" onclick="loadHistory()">
         Refresh Riwayat
       </button>
@@ -791,12 +689,9 @@ tbody tr:hover{
             <th>Catatan</th>
           </tr>
         </thead>
-
         <tbody id="historyBody">
           <tr>
-            <td colspan="7" class="empty">
-              Belum ada riwayat pembayaran.
-            </td>
+            <td colspan="7" class="empty">Memuat riwayat pembayaran...</td>
           </tr>
         </tbody>
       </table>
@@ -805,68 +700,36 @@ tbody tr:hover{
 
 </main>
 
-
 <!-- MODAL PEMBAYARAN -->
 <div class="modal" id="paymentModal">
   <div class="modal-card">
-
     <div class="modal-head">
       <h3>💰 Pembayaran Servis</h3>
-      <button class="close" onclick="closePayment()">×</button>
+      <button class="close" onclick="closePayment()" aria-label="Tutup">×</button>
     </div>
 
     <form id="paymentForm" onsubmit="submitPayment(event)">
-
       <div class="modal-body">
 
         <div class="detail-box">
-          <div class="detail-row">
-            <span>ID Servis</span>
-            <strong id="payId">-</strong>
-          </div>
-
-          <div class="detail-row">
-            <span>Nama Pelanggan</span>
-            <strong id="payCustomer">-</strong>
-          </div>
-
-          <div class="detail-row">
-            <span>Total Tagihan</span>
-            <strong id="payTotal">Rp0</strong>
-          </div>
-
-          <div class="detail-row">
-            <span>Sudah Dibayar</span>
-            <strong id="payPaid">Rp0</strong>
-          </div>
-
-          <div class="detail-row">
-            <span>Sisa Piutang</span>
-            <strong id="payRemaining" style="color:#dc2626">
-              Rp0
-            </strong>
-          </div>
+          <div class="detail-row"><span>ID Servis</span><strong id="payId">-</strong></div>
+          <div class="detail-row"><span>Pelanggan</span><strong id="payCustomer">-</strong></div>
+          <div class="detail-row"><span>Total Tagihan</span><strong id="payTotal">Rp0</strong></div>
+          <div class="detail-row"><span>Sudah Dibayar</span><strong id="payPaid">Rp0</strong></div>
+          <div class="detail-row"><span>Sisa Piutang</span><strong id="payRemaining" style="color:#dc2626">Rp0</strong></div>
         </div>
 
         <div class="notice">
-          Masukkan nominal pembayaran yang diterima.
-          Nominal tidak boleh melebihi sisa piutang.
+          Masukkan nominal yang benar-benar diterima.
+          Pembayaran tidak boleh melebihi sisa piutang.
         </div>
 
         <input type="hidden" id="paymentServiceId">
 
         <div class="form-grid">
-
           <div class="field full">
             <label for="paymentAmount">Nominal Pembayaran (Rp)</label>
-            <input
-              type="number"
-              id="paymentAmount"
-              min="1"
-              step="1"
-              required
-              placeholder="Contoh: 50000"
-            >
+            <input type="number" id="paymentAmount" min="1" step="1" required placeholder="Contoh: 50000">
           </div>
 
           <div class="field">
@@ -882,41 +745,81 @@ tbody tr:hover{
 
           <div class="field">
             <label for="paymentNote">Catatan</label>
-            <input
-              id="paymentNote"
-              type="text"
-              placeholder="Opsional"
-            >
+            <input id="paymentNote" type="text" placeholder="Opsional">
           </div>
-
         </div>
       </div>
 
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-light"
-          onclick="closePayment()"
-        >
-          Batal
-        </button>
-
-        <button
-          type="submit"
-          class="btn btn-yellow"
-          id="savePaymentButton"
-        >
-          Simpan Pembayaran
-        </button>
+        <button type="button" class="btn btn-light" onclick="closePayment()">Batal</button>
+        <button type="submit" class="btn btn-yellow" id="savePaymentButton">Simpan Pembayaran</button>
       </div>
-
     </form>
   </div>
 </div>
 
+<!-- MODAL STATUS PENGERJAAN -->
+<div class="modal" id="processModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>⚙️ Status Pengerjaan Servis</h3>
+      <button class="close" onclick="closeProcess()" aria-label="Tutup">×</button>
+    </div>
 
-<div class="toast" id="toast"></div>
+    <form id="processForm" onsubmit="submitProcess(event)">
+      <div class="modal-body">
 
+        <div class="detail-box">
+          <div class="detail-row">
+            <span>ID Servis</span>
+            <strong id="processIdText">-</strong>
+          </div>
+          <div class="detail-row">
+            <span>Pelanggan</span>
+            <strong id="processCustomer">-</strong>
+          </div>
+          <div class="detail-row">
+            <span>Perangkat</span>
+            <strong id="processDevice">-</strong>
+          </div>
+        </div>
+
+        <div class="notice">
+          Status pengerjaan disimpan secara terpisah dari status pembayaran.
+          Mengubah status pengerjaan tidak akan mengubah nilai tagihan atau pembayaran.
+        </div>
+
+        <input type="hidden" id="processServiceId">
+
+        <div class="form-grid">
+          <div class="field full">
+            <label for="processStatus">Pilih Status Pengerjaan</label>
+            <select id="processStatus" required>
+              <option value="Menunggu">Menunggu</option>
+              <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
+              <option value="Menunggu Sparepart">Menunggu Sparepart</option>
+              <option value="Selesai">Selesai</option>
+              <option value="Sudah Diambil">Sudah Diambil</option>
+              <option value="Dibatalkan">Dibatalkan</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="processNote">Catatan Pengerjaan</label>
+            <textarea id="processNote" maxlength="1000" placeholder="Contoh: Menunggu LCD datang atau penggantian konektor selesai."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" onclick="closeProcess()">Batal</button>
+        <button type="submit" class="btn btn-yellow" id="saveProcessButton">Simpan Status</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 /* ===================================
@@ -935,10 +838,10 @@ let allServices = [];
 let filteredServices = [];
 let paymentHistory = [];
 let currentPage = 1;
+let currentPaymentService = null;
+let currentProcessService = null;
 
 const PAGE_SIZE = 15;
-
-let currentPaymentService = null;
 
 
 /* ===================================
@@ -955,24 +858,20 @@ function money(value){
   }).format(n);
 }
 
-
 function numberValue(value){
   if(typeof value === 'number'){
     return Number.isFinite(value) ? value : 0;
   }
 
   const s = String(value ?? '').trim();
-
   if(!s) return 0;
 
   const n = Number(s);
-
   return Number.isFinite(n) ? n : 0;
 }
 
-
 function esc(value){
-  return String(value ?? '').replace(/[&<>"']/g, c => ({
+  return String(value ?? '').replace(/[&<>"']/g,c=>({
     '&':'&amp;',
     '<':'&lt;',
     '>':'&gt;',
@@ -981,28 +880,22 @@ function esc(value){
   }[c]));
 }
 
-
 function formatDate(value){
   if(!value) return '-';
 
-  let d;
-
   if(value instanceof Date){
-    d = value;
-  }else{
-    const s = String(value);
-
-    if(/^\d{4}-\d{2}-\d{2}/.test(s)){
-      const p = s.slice(0,10).split('-');
-      return p[2] + '/' + p[1] + '/' + p[0];
-    }
-
-    d = new Date(value);
+    return new Intl.DateTimeFormat('id-ID').format(value);
   }
 
-  if(Number.isNaN(d.getTime())){
-    return String(value);
+  const s = String(value);
+
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)){
+    const p = s.slice(0,10).split('-');
+    return p[2]+'/'+p[1]+'/'+p[0];
   }
+
+  const d = new Date(value);
+  if(Number.isNaN(d.getTime())) return s;
 
   return new Intl.DateTimeFormat('id-ID',{
     day:'2-digit',
@@ -1011,12 +904,11 @@ function formatDate(value){
   }).format(d);
 }
 
-
 function dateMonth(value){
   if(!value) return '';
 
   if(value instanceof Date){
-    return value.getFullYear() + '-' +
+    return value.getFullYear()+'-'+
       String(value.getMonth()+1).padStart(2,'0');
   }
 
@@ -1027,13 +919,11 @@ function dateMonth(value){
   }
 
   const d = new Date(value);
-
   if(Number.isNaN(d.getTime())) return '';
 
-  return d.getFullYear() + '-' +
+  return d.getFullYear()+'-'+
     String(d.getMonth()+1).padStart(2,'0');
 }
-
 
 function showToast(message){
   const el = document.getElementById('toast');
@@ -1042,18 +932,59 @@ function showToast(message){
   el.classList.add('show');
 
   clearTimeout(showToast.timer);
-
   showToast.timer = setTimeout(()=>{
     el.classList.remove('show');
-  },3500);
+  },4000);
 }
-
 
 function setApiStatus(online,message){
   document.getElementById('apiDot').className =
-    'dot ' + (online ? 'online' : 'offline');
+    'dot '+(online?'online':'offline');
 
   document.getElementById('apiText').textContent = message;
+}
+
+function getServiceId(x){
+  return String(x['ID Servis'] ?? x.ID ?? '');
+}
+
+function getRemaining(x){
+  const total = numberValue(x['Total Tagihan']);
+  const paid = numberValue(x.Dibayar);
+  const stored = x['Sisa Piutang'];
+
+  if(stored !== '' && stored !== null && stored !== undefined){
+    const value = numberValue(stored);
+    if(value >= 0) return value;
+  }
+
+  return Math.max(0,total-paid);
+}
+
+function getPaymentStatus(x){
+  return getRemaining(x)<=0 ? 'Lunas' : 'Belum Lunas';
+}
+
+function getWorkStatus(x){
+  return String(x['Status Pengerjaan'] || 'Menunggu');
+}
+
+function badgePengerjaan(status){
+  const s = String(status || 'Menunggu');
+
+  let cls = 'badge-yellow';
+
+  if(s === 'Sedang Dikerjakan'){
+    cls = 'badge-blue';
+  }else if(s === 'Menunggu Sparepart'){
+    cls = 'badge-red';
+  }else if(s === 'Selesai' || s === 'Sudah Diambil'){
+    cls = 'badge-green';
+  }else if(s === 'Dibatalkan'){
+    cls = 'badge-gray';
+  }
+
+  return '<span class="badge '+cls+'">'+esc(s)+'</span>';
 }
 
 
@@ -1062,9 +993,9 @@ function setApiStatus(online,message){
 =================================== */
 
 async function apiGet(action){
-  const url = FIXZY_API_URL +
-    '?action=' + encodeURIComponent(action) +
-    '&_=' + Date.now();
+  const url = FIXZY_API_URL+
+    '?action='+encodeURIComponent(action)+
+    '&_='+Date.now();
 
   const response = await fetch(url,{
     method:'GET',
@@ -1072,7 +1003,7 @@ async function apiGet(action){
   });
 
   if(!response.ok){
-    throw new Error('HTTP ' + response.status);
+    throw new Error('HTTP '+response.status);
   }
 
   const result = await response.json();
@@ -1084,13 +1015,7 @@ async function apiGet(action){
   return result;
 }
 
-
 async function apiPost(data){
-  /*
-    Apps Script Web App menerima POST JSON.
-    Respons harus diperiksa sebelum dianggap berhasil.
-  */
-
   const response = await fetch(FIXZY_API_URL,{
     method:'POST',
     headers:{
@@ -1100,12 +1025,12 @@ async function apiPost(data){
   });
 
   if(!response.ok){
-    throw new Error('HTTP ' + response.status);
+    throw new Error('HTTP '+response.status);
   }
 
   const result = await response.json();
 
-  if(!result.ok){
+  if(result.ok === false){
     throw new Error(result.message || 'Penyimpanan gagal.');
   }
 
@@ -1114,14 +1039,14 @@ async function apiPost(data){
 
 
 /* ===================================
-   MEMUAT DATA
+   MEMUAT DATA SERVIS
 =================================== */
 
 async function loadData(){
   const tbody = document.getElementById('tableBody');
 
   tbody.innerHTML =
-    '<tr><td colspan="10" class="loading">Memuat data servis...</td></tr>';
+    '<tr><td colspan="11" class="loading">Memuat data servis...</td></tr>';
 
   try{
     const result = await apiGet('servis');
@@ -1130,24 +1055,19 @@ async function loadData(){
       ? result.data
       : [];
 
-    allServices.sort((a,b)=>{
-      const da = String(a.Tanggal || '');
-      const db = String(b.Tanggal || '');
-
-      return db.localeCompare(da);
-    });
+    allServices.sort((a,b)=>
+      String(b.Tanggal||'').localeCompare(String(a.Tanggal||''))
+    );
 
     setApiStatus(true,'API terhubung');
 
     document.getElementById('lastUpdate').textContent =
-      'Diperbarui ' +
-      new Date().toLocaleTimeString('id-ID',{
+      'Diperbarui '+new Date().toLocaleTimeString('id-ID',{
         hour:'2-digit',
         minute:'2-digit'
       });
 
     applyFilters();
-
     await loadHistory();
 
   }catch(error){
@@ -1156,13 +1076,13 @@ async function loadData(){
     setApiStatus(false,'API bermasalah');
 
     tbody.innerHTML =
-      '<tr><td colspan="10" class="empty">' +
-      'Gagal memuat data servis.<br><br>' +
-      esc(error.message) +
-      '<br><br>Periksa URL Web App dan izin akses Apps Script.' +
+      '<tr><td colspan="11" class="empty">'+
+      'Gagal memuat data servis.<br><br>'+
+      esc(error.message)+
+      '<br><br>Periksa URL Web App dan izin akses Apps Script.'+
       '</td></tr>';
 
-    showToast('Gagal memuat data: ' + error.message);
+    showToast('Gagal memuat data: '+error.message);
   }
 }
 
@@ -1172,43 +1092,24 @@ async function loadData(){
 =================================== */
 
 function updateSummary(data){
-  const jumlah = data.length;
-
   const total = data.reduce(
-    (s,x)=>s + numberValue(x['Total Tagihan']),
-    0
+    (s,x)=>s+numberValue(x['Total Tagihan']),0
   );
 
   const dibayar = data.reduce(
-    (s,x)=>s + numberValue(x.Dibayar),
-    0
+    (s,x)=>s+numberValue(x.Dibayar),0
   );
 
   const piutang = data.reduce(
-    (s,x)=>{
-      const totalTagihan = numberValue(x['Total Tagihan']);
-      const paid = numberValue(x.Dibayar);
-
-      return s + Math.max(
-        0,
-        numberValue(x['Sisa Piutang']) ||
-        (totalTagihan - paid)
-      );
-    },
-    0
+    (s,x)=>s+getRemaining(x),0
   );
 
   document.getElementById('sumJumlah').textContent =
-    jumlah.toLocaleString('id-ID');
+    data.length.toLocaleString('id-ID');
 
-  document.getElementById('sumTagihan').textContent =
-    money(total);
-
-  document.getElementById('sumDibayar').textContent =
-    money(dibayar);
-
-  document.getElementById('sumPiutang').textContent =
-    money(piutang);
+  document.getElementById('sumTagihan').textContent = money(total);
+  document.getElementById('sumDibayar').textContent = money(dibayar);
+  document.getElementById('sumPiutang').textContent = money(piutang);
 }
 
 
@@ -1221,56 +1122,36 @@ function applyFilters(){
     .value.trim().toLowerCase();
 
   const status = document.getElementById('filterStatus').value;
-
   const bulan = document.getElementById('filterBulan').value;
 
   filteredServices = allServices.filter(x=>{
     const text = [
-      x['ID Servis'],
+      getServiceId(x),
       x['Nama Pelanggan'],
       x.WhatsApp,
       x['Model HP'],
       x.IMEI,
       x.Keluhan,
-      x.Teknisi
+      x.Teknisi,
+      getWorkStatus(x)
     ].join(' ').toLowerCase();
 
     const cocokCari = !search || text.includes(search);
-
-    const sisa = Math.max(
-      0,
-      numberValue(x['Sisa Piutang']) ||
-      (
-        numberValue(x['Total Tagihan']) -
-        numberValue(x.Dibayar)
-      )
-    );
-
-    const statusAktual = sisa <= 0
-      ? 'Lunas'
-      : 'Belum Lunas';
-
-    const cocokStatus = !status ||
-      status === statusAktual;
-
-    const cocokBulan = !bulan ||
-      dateMonth(x.Tanggal) === bulan;
+    const cocokStatus = !status || getPaymentStatus(x)===status;
+    const cocokBulan = !bulan || dateMonth(x.Tanggal)===bulan;
 
     return cocokCari && cocokStatus && cocokBulan;
   });
 
   currentPage = 1;
-
   updateSummary(filteredServices);
   renderTable();
 }
-
 
 function resetFilters(){
   document.getElementById('search').value = '';
   document.getElementById('filterStatus').value = '';
   document.getElementById('filterBulan').value = '';
-
   applyFilters();
 }
 
@@ -1285,55 +1166,43 @@ function renderTable(){
   const total = filteredServices.length;
   const pages = Math.max(1,Math.ceil(total/PAGE_SIZE));
 
-  if(currentPage > pages){
-    currentPage = pages;
-  }
+  if(currentPage>pages) currentPage=pages;
 
   const start = (currentPage-1)*PAGE_SIZE;
-
-  const list = filteredServices.slice(
-    start,
-    start+PAGE_SIZE
-  );
+  const list = filteredServices.slice(start,start+PAGE_SIZE);
 
   document.getElementById('jumlahTampil').textContent =
-    total.toLocaleString('id-ID') + ' data';
+    total.toLocaleString('id-ID')+' data';
 
   document.getElementById('pageInfo').textContent =
-    'Halaman ' + currentPage + ' dari ' + pages;
+    'Halaman '+currentPage+' dari '+pages;
 
   if(!list.length){
     tbody.innerHTML =
-      '<tr><td colspan="10" class="empty">' +
-      'Tidak ada data servis yang cocok.' +
+      '<tr><td colspan="11" class="empty">'+
+      'Tidak ada data servis yang cocok.'+
       '</td></tr>';
-
     return;
   }
 
   tbody.innerHTML = list.map((x,index)=>{
+    const id = getServiceId(x);
     const totalTagihan = numberValue(x['Total Tagihan']);
     const dibayar = numberValue(x.Dibayar);
+    const sisa = getRemaining(x);
+    const lunas = sisa<=0;
+    const statusKerja = getWorkStatus(x);
 
-    const sisa = Math.max(
-      0,
-      numberValue(x['Sisa Piutang']) ||
-      (totalTagihan-dibayar)
-    );
-
-    const lunas = sisa <= 0;
-
-    const badge = lunas
+    const badgeBayar = lunas
       ? '<span class="badge badge-green">LUNAS</span>'
       : '<span class="badge badge-red">BELUM LUNAS</span>';
 
-    const wa = String(x.WhatsApp || '').replace(/\D/g,'');
+    const bayarButton = !lunas
+      ? '<button class="btn btn-yellow btn-small" data-action="bayar" data-id="'+esc(id)+'">Bayar</button>'
+      : '';
 
-    const waLink = wa
-      ? '<button class="btn btn-green btn-small" ' +
-        'onclick="contactCustomer(\'' +
-        esc(String(x['ID Servis'] || '')) +
-        '\')">WhatsApp</button>'
+    const catatan = x['Catatan Pengerjaan']
+      ? '<div class="muted">'+esc(x['Catatan Pengerjaan'])+'</div>'
       : '';
 
     return `
@@ -1342,50 +1211,43 @@ function renderTable(){
 
         <td>
           <strong>${esc(formatDate(x.Tanggal))}</strong>
-          <div class="muted">${esc(x['ID Servis'] || '-')}</div>
+          <div class="muted">${esc(id||'-')}</div>
         </td>
 
         <td>
-          <div class="customer-name">
-            ${esc(x['Nama Pelanggan'] || '-')}
-          </div>
-          <div class="muted">${esc(x.WhatsApp || '-')}</div>
+          <div class="customer-name">${esc(x['Nama Pelanggan']||'-')}</div>
+          <div class="muted">${esc(x.WhatsApp||'-')}</div>
         </td>
 
         <td>
-          <strong>${esc(x['Model HP'] || '-')}</strong>
-          <div class="muted">IMEI: ${esc(x.IMEI || '-')}</div>
+          <strong>${esc(x['Model HP']||'-')}</strong>
+          <div class="muted">IMEI: ${esc(x.IMEI||'-')}</div>
         </td>
 
-        <td>${esc(x.Keluhan || '-')}</td>
+        <td>${esc(x.Keluhan||'-')}</td>
 
         <td class="money">${money(totalTagihan)}</td>
-
         <td class="money">${money(dibayar)}</td>
 
         <td class="money" style="color:${lunas?'#15803d':'#dc2626'}">
           ${money(sisa)}
         </td>
 
-        <td>${badge}</td>
+        <td>${badgeBayar}</td>
+
+        <td>
+          ${badgePengerjaan(statusKerja)}
+          ${catatan}
+        </td>
 
         <td>
           <div class="actions">
-            ${
-              !lunas
-              ? `<button class="btn btn-yellow btn-small"
-                  onclick="openPayment('${esc(String(x['ID Servis'] || ''))}')">
-                  Bayar
-                </button>`
-              : ''
-            }
-
-            <button class="btn btn-light btn-small"
-              onclick="showDetail('${esc(String(x['ID Servis'] || ''))}')">
-              Detail
-            </button>
-
-            ${waLink}
+            ${bayarButton}
+            <button class="btn btn-light btn-small" data-action="detail" data-id="${esc(id)}">Detail</button>
+            <button class="btn btn-blue btn-small" data-action="proses" data-id="${esc(id)}">⚙ Proses</button>
+            ${x.WhatsApp
+              ? '<button class="btn btn-green btn-small" data-action="wa" data-id="'+esc(id)+'">WhatsApp</button>'
+              : ''}
           </div>
         </td>
       </tr>
@@ -1393,6 +1255,18 @@ function renderTable(){
   }).join('');
 }
 
+document.getElementById('tableBody').addEventListener('click',function(event){
+  const button = event.target.closest('button[data-action]');
+  if(!button) return;
+
+  const id = button.dataset.id;
+  const action = button.dataset.action;
+
+  if(action==='bayar') openPayment(id);
+  if(action==='detail') showDetail(id);
+  if(action==='proses') openProcess(id);
+  if(action==='wa') contactCustomer(id);
+});
 
 function changePage(step){
   const pages = Math.max(
@@ -1402,8 +1276,8 @@ function changePage(step){
 
   currentPage += step;
 
-  if(currentPage < 1) currentPage = 1;
-  if(currentPage > pages) currentPage = pages;
+  if(currentPage<1) currentPage=1;
+  if(currentPage>pages) currentPage=pages;
 
   renderTable();
 }
@@ -1414,9 +1288,7 @@ function changePage(step){
 =================================== */
 
 function showDetail(id){
-  const x = allServices.find(
-    s => String(s['ID Servis']) === String(id)
-  );
+  const x = allServices.find(s=>getServiceId(s)===String(id));
 
   if(!x){
     showToast('Data servis tidak ditemukan.');
@@ -1425,41 +1297,36 @@ function showDetail(id){
 
   const total = numberValue(x['Total Tagihan']);
   const dibayar = numberValue(x.Dibayar);
-
-  const sisa = Math.max(
-    0,
-    numberValue(x['Sisa Piutang']) ||
-    (total-dibayar)
-  );
+  const sisa = getRemaining(x);
 
   const message =
-    'DETAIL SERVIS FIXZY\n\n' +
-    'ID: ' + (x['ID Servis'] || '-') + '\n' +
-    'Tanggal: ' + formatDate(x.Tanggal) + '\n' +
-    'Pelanggan: ' + (x['Nama Pelanggan'] || '-') + '\n' +
-    'WhatsApp: ' + (x.WhatsApp || '-') + '\n' +
-    'Model HP: ' + (x['Model HP'] || '-') + '\n' +
-    'IMEI: ' + (x.IMEI || '-') + '\n' +
-    'Keluhan: ' + (x.Keluhan || '-') + '\n' +
-    'Teknisi: ' + (x.Teknisi || '-') + '\n' +
-    'Biaya Jasa: ' + money(x['Biaya Jasa']) + '\n' +
-    'Total Tagihan: ' + money(total) + '\n' +
-    'Dibayar: ' + money(dibayar) + '\n' +
-    'Sisa Piutang: ' + money(sisa) + '\n' +
-    'Status: ' + (sisa<=0?'Lunas':'Belum Lunas');
+    'DETAIL SERVIS FIXZY\n\n'+
+    'ID: '+(getServiceId(x)||'-')+'\n'+
+    'Tanggal: '+formatDate(x.Tanggal)+'\n'+
+    'Pelanggan: '+(x['Nama Pelanggan']||'-')+'\n'+
+    'WhatsApp: '+(x.WhatsApp||'-')+'\n'+
+    'Model HP: '+(x['Model HP']||'-')+'\n'+
+    'IMEI: '+(x.IMEI||'-')+'\n'+
+    'Keluhan: '+(x.Keluhan||'-')+'\n'+
+    'Teknisi: '+(x.Teknisi||'-')+'\n'+
+    'Biaya Jasa: '+money(x['Biaya Jasa'])+'\n'+
+    'Total Tagihan: '+money(total)+'\n'+
+    'Dibayar: '+money(dibayar)+'\n'+
+    'Sisa Piutang: '+money(sisa)+'\n'+
+    'Status Pembayaran: '+getPaymentStatus(x)+'\n'+
+    'Status Pengerjaan: '+getWorkStatus(x)+'\n'+
+    'Catatan Pengerjaan: '+(x['Catatan Pengerjaan']||'-');
 
   alert(message);
 }
 
 
 /* ===================================
-   PEMBAYARAN SERVIS
+   PEMBAYARAN
 =================================== */
 
 function openPayment(id){
-  const x = allServices.find(
-    s => String(s['ID Servis']) === String(id)
-  );
+  const x = allServices.find(s=>getServiceId(s)===String(id));
 
   if(!x){
     showToast('Data servis tidak ditemukan.');
@@ -1468,55 +1335,34 @@ function openPayment(id){
 
   const total = numberValue(x['Total Tagihan']);
   const dibayar = numberValue(x.Dibayar);
+  const sisa = getRemaining(x);
 
-  const sisa = Math.max(
-    0,
-    numberValue(x['Sisa Piutang']) ||
-    (total-dibayar)
-  );
-
-  if(sisa <= 0){
+  if(sisa<=0){
     showToast('Servis ini sudah lunas.');
     return;
   }
 
   currentPaymentService = x;
 
-  document.getElementById('paymentServiceId').value =
-    x['ID Servis'];
+  document.getElementById('paymentServiceId').value = getServiceId(x);
+  document.getElementById('payId').textContent = getServiceId(x)||'-';
+  document.getElementById('payCustomer').textContent = x['Nama Pelanggan']||'-';
+  document.getElementById('payTotal').textContent = money(total);
+  document.getElementById('payPaid').textContent = money(dibayar);
+  document.getElementById('payRemaining').textContent = money(sisa);
 
-  document.getElementById('payId').textContent =
-    x['ID Servis'] || '-';
-
-  document.getElementById('payCustomer').textContent =
-    x['Nama Pelanggan'] || '-';
-
-  document.getElementById('payTotal').textContent =
-    money(total);
-
-  document.getElementById('payPaid').textContent =
-    money(dibayar);
-
-  document.getElementById('payRemaining').textContent =
-    money(sisa);
-
-  document.getElementById('paymentAmount').value = '';
-  document.getElementById('paymentAmount').max = sisa;
+  const amount = document.getElementById('paymentAmount');
+  amount.value = '';
+  amount.max = sisa;
 
   document.getElementById('paymentNote').value = '';
-
-  document.getElementById('paymentModal')
-    .classList.add('show');
+  document.getElementById('paymentModal').classList.add('show');
 }
-
 
 function closePayment(){
-  document.getElementById('paymentModal')
-    .classList.remove('show');
-
+  document.getElementById('paymentModal').classList.remove('show');
   currentPaymentService = null;
 }
-
 
 async function submitPayment(event){
   event.preventDefault();
@@ -1526,45 +1372,24 @@ async function submitPayment(event){
     return;
   }
 
-  const idServis =
-    document.getElementById('paymentServiceId').value;
+  const idServis = document.getElementById('paymentServiceId').value;
+  const nominal = numberValue(document.getElementById('paymentAmount').value);
+  const metode = document.getElementById('paymentMethod').value;
+  const catatan = document.getElementById('paymentNote').value.trim();
 
-  const nominal = numberValue(
-    document.getElementById('paymentAmount').value
-  );
+  const sisa = getRemaining(currentPaymentService);
 
-  const metode =
-    document.getElementById('paymentMethod').value;
-
-  const catatan =
-    document.getElementById('paymentNote').value.trim();
-
-  const total = numberValue(
-    currentPaymentService['Total Tagihan']
-  );
-
-  const dibayar = numberValue(
-    currentPaymentService.Dibayar
-  );
-
-  const sisa = Math.max(
-    0,
-    numberValue(currentPaymentService['Sisa Piutang']) ||
-    (total-dibayar)
-  );
-
-  if(nominal <= 0){
+  if(nominal<=0){
     showToast('Masukkan nominal pembayaran.');
     return;
   }
 
-  if(nominal > sisa){
+  if(nominal>sisa){
     showToast('Nominal melebihi sisa tagihan.');
     return;
   }
 
   const button = document.getElementById('savePaymentButton');
-
   button.disabled = true;
   button.textContent = 'Menyimpan...';
 
@@ -1578,21 +1403,12 @@ async function submitPayment(event){
     });
 
     closePayment();
-
-    showToast(
-      result.message ||
-      'Pembayaran berhasil dicatat.'
-    );
-
+    showToast(result.message||'Pembayaran berhasil dicatat.');
     await loadData();
 
   }catch(error){
     console.error(error);
-
-    showToast(
-      'Pembayaran gagal: ' + error.message
-    );
-
+    showToast('Pembayaran gagal: '+error.message);
   }finally{
     button.disabled = false;
     button.textContent = 'Simpan Pembayaran';
@@ -1601,20 +1417,117 @@ async function submitPayment(event){
 
 
 /* ===================================
-   WHATSAPP PELANGGAN
+   STATUS PENGERJAAN
 =================================== */
 
-function contactCustomer(id){
-  const x = allServices.find(
-    s => String(s['ID Servis']) === String(id)
-  );
+function openProcess(id){
+  const x = allServices.find(s=>getServiceId(s)===String(id));
 
   if(!x){
     showToast('Data servis tidak ditemukan.');
     return;
   }
 
-  let wa = String(x.WhatsApp || '').replace(/\D/g,'');
+  currentProcessService = x;
+
+  document.getElementById('processServiceId').value = getServiceId(x);
+  document.getElementById('processIdText').textContent = getServiceId(x)||'-';
+  document.getElementById('processCustomer').textContent = x['Nama Pelanggan']||'-';
+  document.getElementById('processDevice').textContent = x['Model HP']||'-';
+
+  const allowed = [
+    'Menunggu',
+    'Sedang Dikerjakan',
+    'Menunggu Sparepart',
+    'Selesai',
+    'Sudah Diambil',
+    'Dibatalkan'
+  ];
+
+  const current = getWorkStatus(x);
+  const select = document.getElementById('processStatus');
+
+  if(!allowed.includes(current)){
+    const option = document.createElement('option');
+    option.value = current;
+    option.textContent = current;
+    select.insertBefore(option,select.firstChild);
+  }
+
+  select.value = current;
+
+  document.getElementById('processNote').value =
+    x['Catatan Pengerjaan']||'';
+
+  document.getElementById('processModal').classList.add('show');
+}
+
+function closeProcess(){
+  document.getElementById('processModal').classList.remove('show');
+  currentProcessService = null;
+}
+
+async function submitProcess(event){
+  event.preventDefault();
+
+  if(!currentProcessService){
+    showToast('Data servis tidak dipilih.');
+    return;
+  }
+
+  const idServis = document.getElementById('processServiceId').value;
+  const statusPengerjaan = document.getElementById('processStatus').value;
+  const catatanPengerjaan = document.getElementById('processNote').value.trim();
+
+  const button = document.getElementById('saveProcessButton');
+  button.disabled = true;
+  button.textContent = 'Menyimpan...';
+
+  try{
+    /*
+      Backend Code.gs harus mendukung action:
+      ubahstatusservis
+
+      Kolom yang diperbarui:
+      Status Pengerjaan
+      Catatan Pengerjaan
+
+      Kolom Status pembayaran tidak boleh diubah.
+    */
+    const result = await apiPost({
+      action:'ubahstatusservis',
+      idServis:idServis,
+      statusPengerjaan:statusPengerjaan,
+      catatanPengerjaan:catatanPengerjaan
+    });
+
+    closeProcess();
+    showToast(result.message||'Status pengerjaan berhasil disimpan.');
+    await loadData();
+
+  }catch(error){
+    console.error(error);
+    showToast('Gagal menyimpan status. Pastikan Code.gs sudah diperbarui. '+error.message);
+  }finally{
+    button.disabled = false;
+    button.textContent = 'Simpan Status';
+  }
+}
+
+
+/* ===================================
+   WHATSAPP
+=================================== */
+
+function contactCustomer(id){
+  const x = allServices.find(s=>getServiceId(s)===String(id));
+
+  if(!x){
+    showToast('Data servis tidak ditemukan.');
+    return;
+  }
+
+  let wa = String(x.WhatsApp||'').replace(/\D/g,'');
 
   if(!wa){
     showToast('Nomor WhatsApp pelanggan belum tersedia.');
@@ -1622,35 +1535,30 @@ function contactCustomer(id){
   }
 
   if(wa.startsWith('0')){
-    wa = '62' + wa.slice(1);
+    wa='62'+wa.slice(1);
   }else if(wa.startsWith('8')){
-    wa = '62' + wa;
+    wa='62'+wa;
   }
 
   const total = numberValue(x['Total Tagihan']);
   const dibayar = numberValue(x.Dibayar);
-
-  const sisa = Math.max(
-    0,
-    numberValue(x['Sisa Piutang']) ||
-    (total-dibayar)
-  );
+  const sisa = getRemaining(x);
 
   const message =
-    'Halo ' + (x['Nama Pelanggan'] || '') +
-    ', kami dari FIXZY ingin menginformasikan servis HP Anda.\n\n' +
-    'ID Servis: ' + (x['ID Servis'] || '-') + '\n' +
-    'Model HP: ' + (x['Model HP'] || '-') + '\n' +
-    'Total tagihan: ' + money(total) + '\n' +
-    'Sudah dibayar: ' + money(dibayar) + '\n' +
-    'Sisa tagihan: ' + money(sisa) + '\n\n' +
+    'Halo '+(x['Nama Pelanggan']||'')+
+    ', kami dari FIXZY ingin menginformasikan servis HP Anda.\n\n'+
+    'ID Servis: '+(getServiceId(x)||'-')+'\n'+
+    'Model HP: '+(x['Model HP']||'-')+'\n'+
+    'Status pengerjaan: '+getWorkStatus(x)+'\n'+
+    'Total tagihan: '+money(total)+'\n'+
+    'Sudah dibayar: '+money(dibayar)+'\n'+
+    'Sisa tagihan: '+money(sisa)+'\n\n'+
     'Terima kasih.';
 
-  const url =
-    'https://wa.me/' + wa +
-    '?text=' + encodeURIComponent(message);
-
-  window.open(url,'_blank');
+  window.open(
+    'https://wa.me/'+wa+'?text='+encodeURIComponent(message),
+    '_blank'
+  );
 }
 
 
@@ -1664,34 +1572,27 @@ async function loadHistory(){
   try{
     const result = await apiGet('riwayatpembayaran');
 
-    paymentHistory = Array.isArray(result.data)
-      ? result.data
-      : [];
+    paymentHistory = Array.isArray(result.data)?result.data:[];
 
     paymentHistory.sort((a,b)=>
-      String(b.Tanggal || '').localeCompare(
-        String(a.Tanggal || '')
-      )
+      String(b.Tanggal||'').localeCompare(String(a.Tanggal||''))
     );
 
     if(!paymentHistory.length){
       tbody.innerHTML =
-        '<tr><td colspan="7" class="empty">' +
-        'Belum ada riwayat pembayaran.' +
-        '</td></tr>';
-
+        '<tr><td colspan="7" class="empty">Belum ada riwayat pembayaran.</td></tr>';
       return;
     }
 
     tbody.innerHTML = paymentHistory.map(x=>`
       <tr>
         <td>${esc(formatDate(x.Tanggal))}</td>
-        <td>${esc(x['ID Pembayaran'] || '-')}</td>
-        <td>${esc(x['ID Servis'] || '-')}</td>
-        <td>${esc(x['Nama Pelanggan'] || '-')}</td>
+        <td>${esc(x['ID Pembayaran']||'-')}</td>
+        <td>${esc(x['ID Servis']||'-')}</td>
+        <td>${esc(x['Nama Pelanggan']||'-')}</td>
         <td class="money">${money(x.Nominal)}</td>
-        <td>${esc(x.Metode || '-')}</td>
-        <td>${esc(x.Catatan || '-')}</td>
+        <td>${esc(x.Metode||'-')}</td>
+        <td>${esc(x.Catatan||'-')}</td>
       </tr>
     `).join('');
 
@@ -1699,23 +1600,36 @@ async function loadHistory(){
     console.error(error);
 
     tbody.innerHTML =
-      '<tr><td colspan="7" class="empty">' +
-      'Riwayat pembayaran belum dapat dimuat.' +
+      '<tr><td colspan="7" class="empty">'+
+      'Riwayat pembayaran belum dapat dimuat.'+
       '</td></tr>';
   }
 }
 
 
 /* ===================================
-   START
+   EVENT MODAL
 =================================== */
 
-document.getElementById('paymentModal')
-  .addEventListener('click',function(event){
-    if(event.target === this){
-      closePayment();
-    }
-  });
+document.getElementById('paymentModal').addEventListener('click',function(event){
+  if(event.target===this) closePayment();
+});
+
+document.getElementById('processModal').addEventListener('click',function(event){
+  if(event.target===this) closeProcess();
+});
+
+document.addEventListener('keydown',function(event){
+  if(event.key==='Escape'){
+    closePayment();
+    closeProcess();
+  }
+});
+
+
+/* ===================================
+   START
+=================================== */
 
 loadData();
 </script>
