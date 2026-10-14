@@ -114,10 +114,11 @@ function detail(id){
 async function deleteService(id){
  const x=find(id);if(!x)return;
  const typed=prompt('Untuk menghapus transaksi ini secara permanen, ketik HAPUS.\nID Servis: '+id);
- if(typed!=='HAPUS'){if(typed!==null)notice('Penghapusan dibatalkan: teks konfirmasi tidak cocok.',true);return;}
+ if(typed===null)return;
+ if(typed.trim().toUpperCase()!=='HAPUS'){notice('Penghapusan dibatalkan: teks konfirmasi tidak cocok.',true);return;}
  if(!confirm('Yakin hapus servis '+id+' beserta data terkait yang didukung backend? Tindakan ini tidak dapat dibatalkan.'))return;
  try{
-  const j=await post({action:'hapustransaksi',idServis:id,id:id,jenis:'servis'});
+  const j=await post({action:'hapustransaksi',idServis:id,id:id,jenis:'servis',konfirmasi:'KONFIRMASI HAPUS'});
   closeModal('detailModal');notice(j.message||'Data servis berhasil dihapus.');await loadData();
  }catch(e){notice('Gagal menghapus data servis: '+e.message,true)}
 }
