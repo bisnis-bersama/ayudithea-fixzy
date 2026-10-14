@@ -65,7 +65,7 @@ th{background:#edf4fa}
 
 .finance-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:8px 0 14px}.finance-head h2{margin:0;font-size:20px}.finance-stats{margin-bottom:14px}.finance-stats .stat strong{font-size:22px;overflow-wrap:anywhere}.finance-stats .stat:nth-child(2){border-top-color:var(--blue)}.finance-stats .stat:nth-child(3){border-top-color:var(--red)}.finance-stats .stat:nth-child(4){border-top-color:#23834a}
 @media(max-width:700px){.finance-head{align-items:flex-start}.finance-head .btn{padding:8px 10px}.finance-stats .stat{min-width:0}.finance-stats .stat strong{font-size:17px}}
-</style></head><body><header class="topbar"><a class="brand" href="index.html" style="text-decoration:none;color:inherit"><img class="brand-logo" src="logofixzy.png" alt="Logo FIXZY"><div><b>FIXZY</b><small>PEMBUKUAN SERVIS & PENJUALAN</small></div></a><div class="top-actions"><span id="apiStatus" class="pill muted">Memeriksa API...</span><a class="btn ghost" href="index.html">Dashboard</a></div></header><div class="layout"><aside class="sidebar"><div class="nav-label">MENU UTAMA</div><a class="nav active" href="index.html">▦ <span>Dashboard</span></a><a class="nav " href="servis.html">＋ <span>Input Servis</span></a><a class="nav " href="penjualan.html">▣ <span>Penjualan</span></a><a class="nav " href="stok.html">▤ <span>Stok Produk</span></a><a class="nav " href="pengeluaran.html">↘ <span>Pengeluaran</span></a><a class="nav " href="data.html">☷ <span>Data Transaksi</span></a><a class="nav" href="pengaturan.html">⚙ <span>Pengaturan</span></a><a class="nav" href="karyawan.html">👥 <span>Data Karyawan</span></a><a class="nav" href="absensi.html">🗓 <span>Absensi</span></a><a class="nav" href="upah.html">💰 <span>Upah Bulanan</span></a><div class="sidebar-note"><b>FIXZY PERSONAL</b><small>Owner & karyawan</small></div></aside><main class="main"><section class="page active" id="page-dashboard"><div class="page-head"><div><p class="eyebrow">RINGKASAN USAHA</p><h1>Dashboard</h1><p class="sub">Pantau aktivitas konter dalam satu tempat.</p></div><span class="date-chip" id="todayLabel"></span></div><div class="stats"><article class="stat"><span>Total servis</span><strong id="statServis">—</strong><small>Jumlah nota servis</small></article><article class="stat"><span>Piutang servis</span><strong id="statPiutang">—</strong><small>Tagihan belum lunas</small></article><article class="stat"><span>Total penjualan</span><strong id="statSales">—</strong><small>Akumulasi penjualan</small></article><article class="stat"><span>Stok menipis</span><strong id="statLowStock">—</strong><small>Perlu diperiksa</small></article></div>
+</style></head><body><header class="topbar"><a class="brand" href="index.html" style="text-decoration:none;color:inherit"><img class="brand-logo" src="logofixzy.png" alt="Logo FIXZY"><div><b>FIXZY</b><small>PEMBUKUAN SERVIS & PENJUALAN</small></div></a><div class="top-actions"><span id="apiStatus" class="pill muted">Memeriksa API...</span><a class="btn ghost" href="index.html">Dashboard</a></div></header><div class="layout"><aside class="sidebar"><div class="nav-label">MENU UTAMA</div><a class="nav active" href="index.html">▦ <span>Dashboard</span></a><a class="nav " href="servis.html">＋ <span>Input Servis</span></a><a class="nav " href="penjualan.html">▣ <span>Penjualan</span></a><a class="nav " href="stok.html">▤ <span>Stok Produk</span></a><a class="nav " href="pengeluaran.html">↘ <span>Pengeluaran</span></a><a class="nav " href="data.html">☷ <span>Data Transaksi</span></a><a class="nav" href="pengaturan.html">⚙ <span>Pengaturan</span></a><a class="nav" href="karyawan.html">👥 <span>Data Karyawan</span></a><a class="nav" href="absensi.html">🗓 <span>Absensi</span></a><a class="nav" href="upah.html">💰 <span>Upah Bulanan</span></a><div class="sidebar-note"><b>FIXZY PERSONAL</b><small>Owner & karyawan</small></div></aside><main class="main"><section class="page active" id="page-dashboard"><div class="page-head"><div><p class="eyebrow">RINGKASAN USAHA</p><h1>Dashboard</h1><p class="sub">Pantau aktivitas konter dalam satu tempat.</p></div><span class="date-chip" id="todayLabel"></span></div><div class="stats"><article class="stat"><span>Total servis</span><strong id="statServis">—</strong><small>Jumlah nota servis</small></article><article class="stat"><span>Piutang servis</span><strong id="statPiutang">—</strong><small>Tagihan belum lunas</small></article><article class="stat"><span>Total penjualan</span><strong id="statSales">—</strong><small>Akumulasi penjualan</small></article><article class="stat"><span>Produk Terjual</span><strong id="statProdukTerjual">—</strong><small>Total kuantitas barang terjual</small></article><article class="stat"><span>Stok menipis</span><strong id="statLowStock">—</strong><small>Perlu diperiksa</small></article></div>
 <div class="finance-head"><div><p class="eyebrow">KEUANGAN USAHA</p><h2>Ringkasan Keuangan</h2><p class="sub">Perhitungan berdasarkan transaksi yang tersimpan di Google Spreadsheet.</p></div><button id="refreshBtn" class="btn ghost">↻ Muat ulang</button></div>
 <div class="stats finance-stats">
 <article class="stat"><span>Omzet</span><strong id="finOmzet">—</strong><small>Servis selesai + penjualan</small></article>
@@ -94,6 +94,23 @@ function dateVal(v){if(v instanceof Date)return v;let s=String(v??'').trim();if(
 function isThisMonth(row){const d=dateVal(row.Tanggal||row.TanggalTransaksi||row['Tanggal Servis']);const now=new Date();return !!d&&d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()}
 function val(row,...keys){for(const k of keys){if(row&&row[k]!==undefined&&row[k]!==null&&row[k]!=='')return row[k]}return 0}
 function sumRows(rows,fn){return (rows||[]).reduce((a,r)=>a+numVal(fn(r)),0)}
+function hitungProdukTerjual(sales){
+  return (sales||[]).reduce((total,row)=>{
+    const raw=val(row,'Items JSON','items JSON','Items','items');
+    if(!raw)return total;
+    try{
+      const items=Array.isArray(raw)?raw:JSON.parse(String(raw));
+      if(!Array.isArray(items))return total;
+      return total+items.reduce((sum,item)=>{
+        const qty=numVal(val(item,'qty','Qty','jumlah','Jumlah','kuantitas','Kuantitas'));
+        return sum+Math.max(0,qty);
+      },0);
+    }catch(err){
+      console.warn('Rincian Items JSON penjualan tidak dapat dibaca:',row['ID Penjualan']||'',err);
+      return total;
+    }
+  },0);
+}
 async function loadDashboard(){
  const recent=$('#recentList');
  try{
@@ -104,6 +121,7 @@ async function loadDashboard(){
   $('#statServis').textContent=d.jumlahServis??servis.length;
   $('#statPiutang').textContent=money(d.totalPiutangServis??sumRows(servis,r=>val(r,'Sisa Piutang')));
   $('#statSales').textContent=money(d.totalPenjualan??sumRows(sales,r=>val(r,'Total')));
+  $('#statProdukTerjual').textContent=hitungProdukTerjual(sales).toLocaleString('id-ID');
   $('#statLowStock').textContent=d.stokMenipis??stocks.filter(r=>numVal(val(r,'Stok'))<=numVal(val(r,'Stok Minimum'))).length;
 
   const validServis=servis.filter(r=>String(val(r,'Status Pengerjaan','Status')).toLowerCase()!=='dibatalkan');
@@ -134,7 +152,7 @@ async function loadDashboard(){
   recent.innerHTML=latest.length?'<div class="table-wrap"><table><thead><tr><th>Jenis</th><th>Nomor</th><th>Pelanggan</th><th>Total</th></tr></thead><tbody>'+latest.map(x=>`<tr><td>${esc(x.kind)}</td><td>${esc(x.id)}</td><td>${esc(x.name)}</td><td>${money(x.total)}</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Belum ada transaksi.</div>';
  }catch(e){
   if(recent)recent.innerHTML='<div class="empty">Data belum dapat dimuat: '+esc(e.message)+'<br>Periksa URL Apps Script dan akses API.</div>';
-  ['statServis','statPiutang','statSales','statLowStock','finOmzet','finIncome','finExpense','finProfit','finReceivable','finCost','finInventory','finExpenseCount'].forEach(id=>{const el=$('#'+id);if(el)el.textContent='—'});
+  ['statServis','statPiutang','statSales','statProdukTerjual','statLowStock','finOmzet','finIncome','finExpense','finProfit','finReceivable','finCost','finInventory','finExpenseCount'].forEach(id=>{const el=$('#'+id);if(el)el.textContent='—'});
   toast('Dashboard gagal dimuat: '+e.message);
  }
 }
