@@ -1,126 +1,153 @@
 <!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIXZY | Data Servis</title>
+<style>
+:root{--black:#151515;--yellow:#f5c400;--yellow2:#ffe16b;--white:#fff;--bg:#f4f5f7;--muted:#69707a;--line:#e5e7eb;--green:#16834a;--red:#c62828;--blue:#1769aa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:#202124}
+header{background:linear-gradient(120deg,#111 0%,#222 70%,#3b3100 100%);color:white;padding:18px 20px;border-bottom:4px solid var(--yellow)}
+.head{max-width:1400px;margin:auto;display:flex;align-items:center;gap:14px}.logo{width:56px;height:56px;object-fit:contain;background:#080808;border:1px solid #5a4b00;border-radius:13px;padding:5px}.brand h1{margin:0;font-size:23px;letter-spacing:1px}.brand p{margin:5px 0 0;color:#ddd;font-size:13px}
+main{max-width:1400px;margin:22px auto;padding:0 16px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}.toolbar input,.toolbar select,.field input,.field select,.field textarea{border:1px solid #d6d9de;border-radius:10px;padding:11px 12px;background:white;font:inherit;min-width:0}.toolbar input{flex:1;min-width:180px}
+button{border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:pointer;font-size:13px}.primary{background:var(--yellow);color:#171717}.dark{background:#202124;color:white}.blue{background:var(--blue);color:white}.green{background:var(--green);color:white}.red{background:var(--red);color:white}.light{background:#eceff3;color:#222}.small{padding:7px 9px;font-size:12px;margin:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:0 3px 12px #15151508}.card .label{color:var(--muted);font-size:12px}.card strong{display:block;margin-top:7px;font-size:22px}.card:nth-child(2){border-top:4px solid var(--yellow)}.card:nth-child(3){border-top:4px solid var(--blue)}.card:nth-child(4){border-top:4px solid var(--red)}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 3px 12px #15151508}.panel-head{padding:15px 16px;display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line)}.panel-head h2{margin:0;font-size:17px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;min-width:1050px}th,td{padding:12px 10px;border-bottom:1px solid #edf0f2;text-align:left;font-size:13px;vertical-align:top}th{background:#f8f8f8;color:#454950;white-space:nowrap}tbody tr:hover{background:#fffdf2}.sub{color:var(--muted);font-size:11px;margin-top:4px}.badge{display:inline-block;border-radius:30px;padding:5px 8px;font-size:11px;font-weight:700;white-space:nowrap}.b-green{background:#d9f5e5;color:#116b3b}.b-yellow{background:#fff1b8;color:#725500}.b-blue{background:#dcecff;color:#174f91}.b-red{background:#ffe0e0;color:#a21e1e}.b-gray{background:#e9ecef;color:#454950}.empty{text-align:center;padding:35px;color:var(--muted)}.notice{margin:0 0 14px;padding:12px 14px;border-radius:10px;background:#fff5cc;border:1px solid #efd56a;font-size:13px;display:none}.loading{padding:24px;text-align:center;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;background:#0009;z-index:20;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.dialog{width:min(600px,100%);max-height:90vh;overflow:auto;background:white;border-radius:16px;box-shadow:0 20px 70px #0005}.dialog-head{background:#161616;color:white;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--yellow)}.dialog-head h3{margin:0;font-size:17px}.x{background:transparent;color:white;font-size:23px;padding:0 5px}.dialog-body{padding:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;color:#535962;font-weight:700}.field input,.field select,.field textarea{width:100%}.field.full{grid-column:1/-1}.dialog-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:0 18px 18px}.detail-grid{display:grid;grid-template-columns:130px 1fr;gap:10px;font-size:13px}.detail-grid b{color:#59616b}.detail-actions{display:flex!important;flex-wrap:wrap;gap:8px;padding:14px 18px 18px;border-top:1px solid var(--line);width:100%;visibility:visible;opacity:1}.detail-actions button{flex:1 1 130px;min-height:38px;display:inline-block;visibility:visible;opacity:1}.danger-note{font-size:12px;color:#a21e1e;margin:0 18px 14px;line-height:1.45}.hint{font-size:12px;color:var(--muted);line-height:1.5}.actions{min-width:190px}
+@media(max-width:760px){main{padding:0 10px;margin:14px auto}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.card{padding:12px}.card strong{font-size:18px}.head{align-items:center}.brand h1{font-size:19px}.logo{width:48px;height:48px}.panel-head{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar select{flex:1}.toolbar button{flex:1}}
+@media print{header{background:#fff;color:#000;border-bottom:2px solid #000}.brand p{color:#333}.toolbar,.actions,.notice,.panel-head button{display:none!important}body{background:#fff}main{max-width:none;margin:0;padding:0}.cards{grid-template-columns:repeat(4,1fr)}.panel{box-shadow:none}table{min-width:0}th,td{font-size:10px;padding:6px}}
+</style>
+</head>
+<body>
+<header><div class="head">
+<img class="logo" src="logofixzy.png" alt="FIXZY" onerror="this.style.display='none'">
+<div class="brand"><h1>FIXZY <span style="color:#f5c400">| DATA SERVIS</span></h1><p>Pengelolaan pengerjaan, pembayaran, dan pengembalian DP</p></div>
+</div></header>
+<main>
+<div id="notice" class="notice"></div>
+<div class="toolbar">
+<input id="search" placeholder="Cari ID transaksi, pelanggan, WhatsApp, atau barang..." oninput="render();renderSales()">
+<select id="filterWork" onchange="render()"><option value="">Semua pengerjaan</option><option>Masuk</option><option>Menunggu Sparepart</option><option>Proses</option><option>Selesai</option><option>Sudah Diambil</option><option>Dibatalkan</option></select>
+<select id="filterPay" onchange="render();renderSales()"><option value="">Semua pembayaran</option><option>Lunas</option><option>Belum Lunas</option></select>
+<button class="primary" onclick="loadData()">↻ Muat Ulang</button><button class="dark" onclick="window.print()">Cetak</button>
+</div>
+<div class="cards">
+<div class="card"><div class="label">TOTAL SERVIS</div><strong id="count">0</strong></div>
+<div class="card"><div class="label">TAGIHAN / PIUTANG</div><strong id="receivable">Rp0</strong></div>
+<div class="card"><div class="label">SUDAH DIBAYAR</div><strong id="paid">Rp0</strong></div>
+<div class="card"><div class="label">DP MENUNGGU PENGEMBALIAN</div><strong id="refund">Rp0</strong></div>
+<div class="card"><div class="label">DP SUDAH DIKEMBALIKAN</div><strong id="refunded">Rp0</strong></div>
+</div>
+<div class="toolbar" style="margin-top:8px">
+<button class="primary" type="button" onclick="showTransactionView('servis')">Data Servis</button>
+<button class="blue" type="button" onclick="showTransactionView('penjualan')">Data Penjualan</button>
+</div>
+<section class="panel" id="salesPanel" style="display:none">
+<div class="panel-head"><h2>Daftar Penjualan</h2><span class="hint">Data dari tab Penjualan melalui API FIXZY.</span><button class="primary" type="button" onclick="loadSales()">↻ Muat Ulang Penjualan</button></div>
+<div class="scroll"><table><thead><tr><th>ID / Tanggal</th><th>Pelanggan / WhatsApp</th><th>Rincian Barang</th><th>Total</th><th>Dibayar</th><th>Sisa</th><th>Pembayaran</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="salesTbody"><tr><td colspan="9" class="loading">Tekan Data Penjualan untuk memuat data.</td></tr></tbody></table></div>
+</section>
+<section class="panel" id="servicePanel">
+<div class="panel-head"><h2>Daftar Servis</h2><span class="hint">Status pengerjaan terpisah dari status pembayaran.</span></div>
+<div class="scroll"><table><thead><tr><th>ID / Tanggal</th><th>Pelanggan / WhatsApp</th><th>Perangkat / Keluhan</th><th>Total</th><th>Dibayar</th><th>Sisa</th><th>Pembayaran</th><th>Pengerjaan</th><th>Pengembalian DP</th><th>Aksi</th></tr></thead><tbody id="tbody"><tr><td colspan="10" class="loading">Memuat data...</td></tr></tbody></table></div>
+</section>
+</main>
 
-<html lang="id">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1">  
-<title>FIXZY | Data Servis</title>  
-<style>  
-:root{--black:#151515;--yellow:#f5c400;--yellow2:#ffe16b;--white:#fff;--bg:#f4f5f7;--muted:#69707a;--line:#e5e7eb;--green:#16834a;--red:#c62828;--blue:#1769aa}  
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:#202124}  
-header{background:linear-gradient(120deg,#111 0%,#222 70%,#3b3100 100%);color:white;padding:18px 20px;border-bottom:4px solid var(--yellow)}  
-.head{max-width:1400px;margin:auto;display:flex;align-items:center;gap:14px}.logo{width:56px;height:56px;object-fit:contain;background:#080808;border:1px solid #5a4b00;border-radius:13px;padding:5px}.brand h1{margin:0;font-size:23px;letter-spacing:1px}.brand p{margin:5px 0 0;color:#ddd;font-size:13px}  
-main{max-width:1400px;margin:22px auto;padding:0 16px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}.toolbar input,.toolbar select,.field input,.field select,.field textarea{border:1px solid #d6d9de;border-radius:10px;padding:11px 12px;background:white;font:inherit;min-width:0}.toolbar input{flex:1;min-width:180px}  
-button{border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:pointer;font-size:13px}.primary{background:var(--yellow);color:#171717}.dark{background:#202124;color:white}.blue{background:var(--blue);color:white}.green{background:var(--green);color:white}.red{background:var(--red);color:white}.light{background:#eceff3;color:#222}.small{padding:7px 9px;font-size:12px;margin:2px}  
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:0 3px 12px #15151508}.card .label{color:var(--muted);font-size:12px}.card strong{display:block;margin-top:7px;font-size:22px}.card:nth-child(2){border-top:4px solid var(--yellow)}.card:nth-child(3){border-top:4px solid var(--blue)}.card:nth-child(4){border-top:4px solid var(--red)}  
-.panel{background:white;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 3px 12px #15151508}.panel-head{padding:15px 16px;display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line)}.panel-head h2{margin:0;font-size:17px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;min-width:1050px}th,td{padding:12px 10px;border-bottom:1px solid #edf0f2;text-align:left;font-size:13px;vertical-align:top}th{background:#f8f8f8;color:#454950;white-space:nowrap}tbody tr:hover{background:#fffdf2}.sub{color:var(--muted);font-size:11px;margin-top:4px}.badge{display:inline-block;border-radius:30px;padding:5px 8px;font-size:11px;font-weight:700;white-space:nowrap}.b-green{background:#d9f5e5;color:#116b3b}.b-yellow{background:#fff1b8;color:#725500}.b-blue{background:#dcecff;color:#174f91}.b-red{background:#ffe0e0;color:#a21e1e}.b-gray{background:#e9ecef;color:#454950}.empty{text-align:center;padding:35px;color:var(--muted)}.notice{margin:0 0 14px;padding:12px 14px;border-radius:10px;background:#fff5cc;border:1px solid #efd56a;font-size:13px;display:none}.loading{padding:24px;text-align:center;color:var(--muted)}  
-.modal{display:none;position:fixed;inset:0;background:#0009;z-index:20;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.dialog{width:min(600px,100%);max-height:90vh;overflow:auto;background:white;border-radius:16px;box-shadow:0 20px 70px #0005}.dialog-head{background:#161616;color:white;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--yellow)}.dialog-head h3{margin:0;font-size:17px}.x{background:transparent;color:white;font-size:23px;padding:0 5px}.dialog-body{padding:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;color:#535962;font-weight:700}.field input,.field select,.field textarea{width:100%}.field.full{grid-column:1/-1}.dialog-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:0 18px 18px}.detail-grid{display:grid;grid-template-columns:130px 1fr;gap:10px;font-size:13px}.detail-grid b{color:#59616b}.detail-actions{display:flex;flex-wrap:wrap;gap:8px;padding:14px 18px 18px;border-top:1px solid var(--line)}.detail-actions button{flex:1 1 130px}.danger-note{font-size:12px;color:#a21e1e;margin:0 18px 14px;line-height:1.45}.hint{font-size:12px;color:var(--muted);line-height:1.5}.actions{min-width:190px}  
-@media(max-width:760px){main{padding:0 10px;margin:14px auto}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.card{padding:12px}.card strong{font-size:18px}.head{align-items:center}.brand h1{font-size:19px}.logo{width:48px;height:48px}.panel-head{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar select{flex:1}.toolbar button{flex:1}}  
-@media print{header{background:#fff;color:#000;border-bottom:2px solid #000}.brand p{color:#333}.toolbar,.actions,.notice,.panel-head button{display:none!important}body{background:#fff}main{max-width:none;margin:0;padding:0}.cards{grid-template-columns:repeat(4,1fr)}.panel{box-shadow:none}table{min-width:0}th,td{font-size:10px;padding:6px}}  
-</style>  
-</head>  
-<body>  
-<header><div class="head">  
-<img class="logo" src="logofixzy.png" alt="FIXZY" onerror="this.style.display='none'">  
-<div class="brand"><h1>FIXZY <span style="color:#f5c400">| DATA SERVIS</span></h1><p>Pengelolaan pengerjaan, pembayaran, dan pengembalian DP</p></div>  
-</div></header>  
-<main>  
-<div id="notice" class="notice"></div>  
-<div class="toolbar">  
-<input id="search" placeholder="Cari ID servis, pelanggan, WhatsApp, atau model HP..." oninput="render()">  
-<select id="filterWork" onchange="render()"><option value="">Semua pengerjaan</option><option>Masuk</option><option>Menunggu Sparepart</option><option>Proses</option><option>Selesai</option><option>Sudah Diambil</option><option>Dibatalkan</option></select>  
-<select id="filterPay" onchange="render()"><option value="">Semua pembayaran</option><option>Lunas</option><option>Belum Lunas</option></select>  
-<button class="primary" onclick="loadData()">↻ Muat Ulang</button><button class="dark" onclick="window.print()">Cetak</button>  
-</div>  
-<div class="cards">  
-<div class="card"><div class="label">TOTAL SERVIS</div><strong id="count">0</strong></div>  
-<div class="card"><div class="label">TAGIHAN / PIUTANG</div><strong id="receivable">Rp0</strong></div>  
-<div class="card"><div class="label">SUDAH DIBAYAR</div><strong id="paid">Rp0</strong></div>  
-<div class="card"><div class="label">DP MENUNGGU PENGEMBALIAN</div><strong id="refund">Rp0</strong></div>  
-<div class="card"><div class="label">DP SUDAH DIKEMBALIKAN</div><strong id="refunded">Rp0</strong></div>  
-</div>  
-<section class="panel">  
-<div class="panel-head"><h2>Daftar Servis</h2><span class="hint">Status pengerjaan terpisah dari status pembayaran.</span></div>  
-<div class="scroll"><table><thead><tr><th>ID / Tanggal</th><th>Pelanggan / WhatsApp</th><th>Perangkat / Keluhan</th><th>Total</th><th>Dibayar</th><th>Sisa</th><th>Pembayaran</th><th>Pengerjaan</th><th>Pengembalian DP</th><th>Aksi</th></tr></thead><tbody id="tbody"><tr><td colspan="10" class="loading">Memuat data...</td></tr></tbody></table></div>  
-</section>  
-</main>  <div class="modal" id="detailModal"><div class="dialog"><div class="dialog-head"><h3>Detail Servis & Aksi</h3><button class="x" onclick="closeModal('detailModal')">×</button></div><div class="dialog-body" id="detailBody"></div><p class="danger-note">Hapus hanya transaksi percobaan. Penghapusan bersifat permanen.</p><div class="detail-actions" id="detailActions"></div><div class="dialog-actions"><button class="light" onclick="closeModal('detailModal')">Tutup</button></div></div></div>  <div class="modal" id="statusModal"><div class="dialog"><div class="dialog-head"><h3>Ubah Status Pengerjaan</h3><button class="x" onclick="closeModal('statusModal')">×</button></div><div class="dialog-body">  
-<input type="hidden" id="statusId">  
-<div class="form-grid">  
-<div class="field full"><label>Status pengerjaan</label><select id="workStatus"><option value="Masuk">Masuk</option><option value="Menunggu Sparepart">Menunggu Sparepart</option><option value="Proses">Proses</option><option value="Selesai">Selesai</option><option value="Sudah Diambil">Sudah Diambil</option><option value="Dibatalkan">Dibatalkan</option></select></div>  
-<div class="field full"><label>Catatan pengerjaan</label><textarea id="workNote" rows="3" placeholder="Catatan teknisi / alasan pembatalan"></textarea></div>  
-</div><p class="hint">Pilih “Sudah Diambil” setelah perangkat benar-benar diserahkan kepada pelanggan. Status ini otomatis membuat pembayaran tercatat lunas. Jika servis dibatalkan, pengembalian uang harus dicatat setelah benar-benar dibayarkan.</p>  
-</div><div class="dialog-actions"><button class="light" onclick="closeModal('statusModal')">Batal</button><button class="primary" onclick="saveWorkStatus()">Simpan Status</button></div></div></div>  <div class="modal" id="refundModal"><div class="dialog"><div class="dialog-head"><h3>Catat Pengembalian DP</h3><button class="x" onclick="closeModal('refundModal')">×</button></div><div class="dialog-body">  
-<input type="hidden" id="refundId"><div id="refundInfo" class="hint" style="margin-bottom:12px"></div>  
-<div class="form-grid"><div class="field"><label>Nominal pengembalian (Rp)</label><input id="refundAmount" type="number" min="1" step="1"></div><div class="field"><label>Metode</label><select id="refundMethod"><option>Tunai</option><option>Transfer</option><option>QRIS</option><option>Lainnya</option></select></div><div class="field full"><label>Catatan</label><input id="refundNote" placeholder="Nomor referensi transfer / keterangan"></div></div>  
-<p class="hint" style="color:#a21e1e">Penting: catat pengembalian hanya setelah uang benar-benar diberikan kepada pelanggan. Jangan klik simpan jika pengembalian belum dilakukan.</p>  
-</div><div class="dialog-actions"><button class="light" onclick="closeModal('refundModal')">Batal</button><button class="red" onclick="saveRefund()">Konfirmasi Pengembalian</button></div></div></div>  <script>  
-const API='https://script.google.com/macros/s/AKfycbx_X4o5bQ6vQPOhMfnXJP6SXYnEguwCP1ULvlRBvvvfRtfv49Do66jy0zDiC9S_-n9k/exec';  
-let data=[],busy=false;  
-const $=id=>document.getElementById(id);  
-const num=v=>{if(typeof v==='number')return isFinite(v)?v:0;const n=Number(String(v??'').replace(/[^\d,.-]/g,'').replace(/\.(?=.*\.)/g,'').replace(',','.'));return isFinite(n)?n:0};  
-const money=v=>'Rp'+Math.round(num(v)).toLocaleString('id-ID');  
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));  
-function val(x,...keys){for(const k of keys)if(x&&x[k]!==undefined&&x[k]!==null&&x[k]!=='')return x[k];return ''}  
-function work(x){return String(val(x,'Status Pengerjaan','Status Pengerjaan Servis','statusPengerjaan')||'Masuk').trim()}  
-function payStatus(x){return String(val(x,'Status')|| (num(val(x,'Sisa Piutang'))<=0?'Lunas':'Belum Lunas'))}  
-function total(x){return num(val(x,'Total Tagihan','Total'))}  
-function paid(x){return num(val(x,'Dibayar'))}  
-function remain(x){return Math.max(0,num(val(x,'Sisa Piutang', 'Sisa Piutang Servis')) || (total(x)-paid(x)))}  
-function refundStatus(x){return String(val(x,'Status Pengembalian DP','Status Pengembalian','statusPengembalianDP')||'Belum Dikembalikan')}  
-function isRefunded(x){const s=norm(refundStatus(x));return s.includes('sudah dikembalikan')||s==='dikembalikan'||s==='sudah'}  
-function refundAmount(x){const explicit=val(x,'Nominal Pengembalian DP','Nominal Pengembalian','Jumlah Pengembalian DP','Jumlah Dikembalikan');return explicit!==''?Math.max(0,num(explicit)):(norm(work(x))==='dibatalkan'&&isRefunded(x)?paid(x):0)}  
-function norm(s){return String(s||'').toLowerCase().trim()}  
-function badge(text,kind){return `<span class="badge b-${kind}">${esc(text)}</span>`}  
-function statusBadge(x){let s=work(x),k=norm(s)==='sudah diambil'?'green':norm(s)==='dibatalkan'?'red':norm(s)==='selesai'?'blue':'yellow';return badge(s,k)}  
-function payBadge(x){return badge(payStatus(x),norm(payStatus(x))==='lunas'?'green':'yellow')}  
-function refundBadge(x){let s=refundStatus(x);return badge(s,norm(s).includes('sudah')||norm(s)==='dikembalikan'?'green':norm(work(x))==='dibatalkan'&&paid(x)>0?'red':'gray')}  
-function dateText(v){if(!v)return '-';let d=new Date(v);return isNaN(d)?String(v).slice(0,10):d.toLocaleDateString('id-ID')}  
-function notice(msg,error=false){$('notice').style.display='block';$('notice').style.background=error?'#ffe4e4':'#fff5cc';$('notice').style.borderColor=error?'#e5aaaa':'#efd56a';$('notice').textContent=msg;window.scrollTo({top:0,behavior:'smooth'})}  
-async function get(action){const r=await fetch(API+'?action='+encodeURIComponent(action)+'&t='+Date.now());const j=await r.json();if(!j.ok)throw Error(j.message||'Gagal membaca data');return j}  
-async function post(payload){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const j=await r.json();if(!j.ok)throw Error(j.message||'Permintaan gagal');return j}  
-async function loadData(){if(busy)return;busy=true;$('tbody').innerHTML='<tr><td colspan="10" class="loading">Memuat data dari Google Spreadsheet...</td></tr>';try{const j=await get('servis');data=Array.isArray(j.data)?j.data:[];render();$('notice').style.display='none'}catch(e){$('tbody').innerHTML=`<tr><td colspan="10" class="empty">${esc(e.message)}</td></tr>`;notice('Gagal memuat data: '+e.message,true)}finally{busy=false}}  
-function render(){const q=norm($('search').value),fw=norm($('filterWork').value),fp=norm($('filterPay').value);const list=data.filter(x=>{const text=norm([val(x,'ID Servis'),val(x,'Nama Pelanggan'),val(x,'WhatsApp'),val(x,'Model HP'),val(x,'Keluhan')].join(' '));return (!q||text.includes(q))&&(!fw||norm(work(x))===fw)&&(!fp||norm(payStatus(x))===fp)});$('count').textContent=list.length;$('receivable').textContent=money(list.reduce((s,x)=>s+remain(x),0));const totalPaid=list.reduce((s,x)=>s+paid(x),0);const totalRefunded=list.reduce((s,x)=>s+refundAmount(x),0);$('paid').textContent=money(Math.max(0,totalPaid-totalRefunded));$('refund').textContent=money(list.filter(x=>norm(work(x))==='dibatalkan'&&!isRefunded(x)&&paid(x)>0&&!norm(refundStatus(x)).includes('tidak diperlukan')).reduce((s,x)=>s+paid(x),0));$('refunded').textContent=money(totalRefunded);  
-if(!list.length){$('tbody').innerHTML='<tr><td colspan="10" class="empty">Tidak ada data servis yang cocok.</td></tr>';return}  
-$('tbody').innerHTML=list.map(x=>{const id=String(val(x,'ID Servis'));const customer=val(x,'Nama Pelanggan')||'-';const phone=String(val(x,'WhatsApp'));const model=val(x,'Model HP')||'-';const refundEligible=norm(work(x))==='dibatalkan'&&paid(x)>0&&!norm(refundStatus(x)).includes('sudah')&&!norm(refundStatus(x)).includes('dikembalikan');return `<tr>  
-<td><b>${esc(id)}</b><div class="sub">${esc(dateText(val(x,'Tanggal')))}</div></td>  
-<td><b>${esc(customer)}</b><div class="sub">${esc(phone||'No. WA tidak tersedia')}</div></td>  
-<td><b>${esc(model)}</b><div class="sub">${esc(val(x,'Keluhan')||'-')}</div></td>  
-<td><b>${money(total(x))}</b></td><td>${money(paid(x))}</td><td>${money(remain(x))}</td>  
-<td>${payBadge(x)}</td><td>${statusBadge(x)}</td><td>${refundBadge(x)}</td>  
-<td class="actions"><button class="small primary" onclick="detail('${esc(id)}')">Detail / Aksi</button></td>  
-</tr>`}).join('')}  
-function find(id){return data.find(x=>String(val(x,'ID Servis'))===String(id))}  
-function detail(id){  
- const x=find(id);if(!x)return;  
- const fields=[['ID Servis',val(x,'ID Servis')],['Tanggal',dateText(val(x,'Tanggal'))],['Nama Pelanggan',val(x,'Nama Pelanggan')],['WhatsApp',val(x,'WhatsApp')],['Model HP',val(x,'Model HP')],['IMEI',val(x,'IMEI')],['Keluhan',val(x,'Keluhan')],['Biaya Jasa',money(val(x,'Biaya Jasa'))],['Teknisi',val(x,'Teknisi')],['Sparepart',val(x,'Sparepart JSON')],['Total Tagihan',money(total(x))],['Total Dibayar',money(paid(x))],['Sisa Piutang',money(remain(x))],['Status Pembayaran',payStatus(x)],['Status Pengerjaan',work(x)],['Catatan Pengerjaan',val(x,'Catatan Pengerjaan')||'-'],['Status Pengembalian DP',refundStatus(x)],['Catatan Internal',val(x,'Catatan Internal')||'-']];  
- $('detailBody').innerHTML='<div class="detail-grid">'+fields.map(a=>`<b>${esc(a[0])}</b><span>${esc(a[1]||'-')}</span>`).join('')+'</div>';  
- const idSafe=String(val(x,'ID Servis'));  
- const buttons=[`<button class="blue" onclick="closeModal('detailModal');openStatus('${esc(idSafe)}')">Proses / Ubah Status</button>`];  
- if(val(x,'WhatsApp'))buttons.push(`<button class="dark" onclick="whatsapp('${esc(idSafe)}')">WhatsApp</button>`);  
- if(norm(work(x))==='dibatalkan'&&paid(x)>0&&!isRefunded(x)&&!norm(refundStatus(x)).includes('tidak diperlukan'))buttons.push(`<button class="red" onclick="closeModal('detailModal');openRefund('${esc(idSafe)}')">Kembalikan DP</button>`);  
- buttons.push(`<button class="red" onclick="deleteService('${esc(idSafe)}')">Hapus Data Servis</button>`);  
- $('detailActions').innerHTML=buttons.join('');  
- $('detailModal').classList.add('show');  
-}  
-async function deleteService(id){  
- const x=find(id);if(!x)return;  
- const typed=prompt('Untuk menghapus transaksi ini secara permanen, ketik HAPUS.\nID Servis: '+id);  
- if(typed===null)return;  
- if(typed.trim().toUpperCase()!=='HAPUS'){notice('Penghapusan dibatalkan: teks konfirmasi tidak cocok.',true);return;}  
- if(!confirm('Yakin hapus servis '+id+' beserta data terkait yang didukung backend? Tindakan ini tidak dapat dibatalkan.'))return;  
- try{  
-  const j=await post({action:'hapustransaksi',idServis:id,id:id,jenis:'servis',konfirmasi:'KONFIRMASI HAPUS'});  
-  closeModal('detailModal');notice(j.message||'Data servis berhasil dihapus.');await loadData();  
- }catch(e){notice('Gagal menghapus data servis: '+e.message,true)}  
-}  
-function openStatus(id){const x=find(id);if(!x)return;$('statusId').value=id;$('workStatus').value=work(x);$('workNote').value=val(x,'Catatan Pengerjaan')||'';$('statusModal').classList.add('show')}  
-async function saveWorkStatus(){const id=$('statusId').value,status=$('workStatus').value,catatan=$('workNote').value;const x=find(id);if(!x)return;if(status==='Sudah Diambil'&&!confirm('Ubah menjadi SUDAH DIAMBIL? Sistem akan otomatis menganggap seluruh tagihan LUNAS dan mencatat pelunasan saat pengambilan.'))return;if(status==='Dibatalkan'&&!confirm('Batalkan servis ini? Pastikan pengembalian seluruh uang yang diterima akan dicatat setelah benar-benar dibayarkan.'))return;try{const j=await post({action:'ubahstatusservis',idServis:id,statusPengerjaan:status,catatanPengerjaan:catatan});closeModal('statusModal');notice(j.message||'Status pengerjaan diperbarui.');await loadData()}catch(e){notice('Gagal mengubah status: '+e.message,true)}}  
-function numInput(v){const n=Number(v);return Number.isFinite(n)?n:0}  
-function openRefund(id){const x=find(id);if(!x)return;if(norm(work(x))!=='dibatalkan'){notice('Pengembalian hanya tersedia untuk servis yang dibatalkan.',true);return}if(norm(refundStatus(x)).includes('sudah')||norm(refundStatus(x))==='dikembalikan'){notice('Pengembalian sudah tercatat.',true);return}$('refundId').value=id;$('refundAmount').value=paid(x);$('refundAmount').max=paid(x);$('refundNote').value='';$('refundInfo').textContent=`${val(x,'Nama Pelanggan')} • Uang diterima tercatat ${money(paid(x))}. Backend harus mencatat pengembalian secara penuh.`;$('refundModal').classList.add('show')}  
-async function saveRefund(){const id=$('refundId').value,x=find(id),nominal=numInput($('refundAmount').value);if(!x)return;if(nominal!==paid(x)){notice('Nominal pengembalian harus sama dengan total uang yang tercatat diterima: '+money(paid(x)),true);return}if(!confirm('Pastikan uang benar-benar sudah dikembalikan kepada pelanggan. Simpan pencatatan pengembalian sekarang?'))return;try{const j=await post({action:'kembalikanDP',idServis:id,nominal,metode:$('refundMethod').value,catatan:$('refundNote').value});closeModal('refundModal');notice(j.message||'Pengembalian dicatat.');await loadData()}catch(e){notice('Pengembalian gagal: '+e.message,true)}}  
-function whatsapp(id){const x=find(id);if(!x)return;const phone=String(val(x,'WhatsApp')).replace(/\D/g,'').replace(/^0/,'62');if(!phone){notice('Nomor WhatsApp tidak tersedia.',true);return}const msg=`Halo ${val(x,'Nama Pelanggan')||'Kak'}, informasi servis FIXZY:\nID Servis: ${val(x,'ID Servis')}\nHP: ${val(x,'Model HP')}\nStatus pengerjaan: ${work(x)}\nTotal tagihan: ${money(total(x))}\nSudah dibayar: ${money(paid(x))}\nSisa tagihan: ${money(remain(x))}\nTerima kasih.`;window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank','noopener')}  
-function closeModal(id){$(id).classList.remove('show')}  
-document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));  
-loadData();  
-</script>  </body>  
+<div class="modal" id="detailModal"><div class="dialog"><div class="dialog-head"><h3>Detail Servis & Aksi</h3><button class="x" onclick="closeModal('detailModal')">×</button></div><div class="dialog-body" id="detailBody"></div><p class="danger-note">Hapus hanya transaksi percobaan. Penghapusan bersifat permanen.</p><div class="detail-actions" id="detailActions"></div><div class="dialog-actions"><button class="light" onclick="closeModal('detailModal')">Tutup</button></div></div></div>
+
+<div class="modal" id="statusModal"><div class="dialog"><div class="dialog-head"><h3>Ubah Status Pengerjaan</h3><button class="x" onclick="closeModal('statusModal')">×</button></div><div class="dialog-body">
+<input type="hidden" id="statusId">
+<div class="form-grid">
+<div class="field full"><label>Status pengerjaan</label><select id="workStatus"><option value="Masuk">Masuk</option><option value="Menunggu Sparepart">Menunggu Sparepart</option><option value="Proses">Proses</option><option value="Selesai">Selesai</option><option value="Sudah Diambil">Sudah Diambil</option><option value="Dibatalkan">Dibatalkan</option></select></div>
+<div class="field full"><label>Catatan pengerjaan</label><textarea id="workNote" rows="3" placeholder="Catatan teknisi / alasan pembatalan"></textarea></div>
+</div><p class="hint">Pilih “Sudah Diambil” setelah perangkat benar-benar diserahkan kepada pelanggan. Status ini otomatis membuat pembayaran tercatat lunas. Jika servis dibatalkan, pengembalian uang harus dicatat setelah benar-benar dibayarkan.</p>
+</div><div class="dialog-actions"><button class="light" onclick="closeModal('statusModal')">Batal</button><button class="primary" onclick="saveWorkStatus()">Simpan Status</button></div></div></div>
+
+
+
+<div class="modal" id="refundModal"><div class="dialog"><div class="dialog-head"><h3>Catat Pengembalian DP</h3><button class="x" onclick="closeModal('refundModal')">×</button></div><div class="dialog-body">
+<input type="hidden" id="refundId"><div id="refundInfo" class="hint" style="margin-bottom:12px"></div>
+<div class="form-grid"><div class="field"><label>Nominal pengembalian (Rp)</label><input id="refundAmount" type="number" min="1" step="1"></div><div class="field"><label>Metode</label><select id="refundMethod"><option>Tunai</option><option>Transfer</option><option>QRIS</option><option>Lainnya</option></select></div><div class="field full"><label>Catatan</label><input id="refundNote" placeholder="Nomor referensi transfer / keterangan"></div></div>
+<p class="hint" style="color:#a21e1e">Penting: catat pengembalian hanya setelah uang benar-benar diberikan kepada pelanggan. Jangan klik simpan jika pengembalian belum dilakukan.</p>
+</div><div class="dialog-actions"><button class="light" onclick="closeModal('refundModal')">Batal</button><button class="red" onclick="saveRefund()">Konfirmasi Pengembalian</button></div></div></div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbx_X4o5bQ6vQPOhMfnXJP6SXYnEguwCP1ULvlRBvvvfRtfv49Do66jy0zDiC9S_-n9k/exec';
+let data=[],busy=false;
+const $=id=>document.getElementById(id);
+const num=v=>{if(typeof v==='number')return isFinite(v)?v:0;const n=Number(String(v??'').replace(/[^\d,.-]/g,'').replace(/\.(?=.*\.)/g,'').replace(',','.'));return isFinite(n)?n:0};
+const money=v=>'Rp'+Math.round(num(v)).toLocaleString('id-ID');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function val(x,...keys){for(const k of keys)if(x&&x[k]!==undefined&&x[k]!==null&&x[k]!=='')return x[k];return ''}
+function work(x){return String(val(x,'Status Pengerjaan','Status Pengerjaan Servis','statusPengerjaan')||'Masuk').trim()}
+function payStatus(x){return String(val(x,'Status')|| (num(val(x,'Sisa Piutang'))<=0?'Lunas':'Belum Lunas'))}
+function total(x){return num(val(x,'Total Tagihan','Total Penjualan','Total Belanja','Grand Total','Total'))}
+function paid(x){return num(val(x,'Dibayar','Jumlah Dibayar','Total Dibayar','Bayar'))}
+function remain(x){return Math.max(0,num(val(x,'Sisa Piutang', 'Sisa Piutang Servis')) || (total(x)-paid(x)))}
+function refundStatus(x){return String(val(x,'Status Pengembalian DP','Status Pengembalian','statusPengembalianDP')||'Belum Dikembalikan')}
+function isRefunded(x){const s=norm(refundStatus(x));return s.includes('sudah dikembalikan')||s==='dikembalikan'||s==='sudah'}
+function refundAmount(x){const explicit=val(x,'Nominal Pengembalian DP','Nominal Pengembalian','Jumlah Pengembalian DP','Jumlah Dikembalikan');return explicit!==''?Math.max(0,num(explicit)):(norm(work(x))==='dibatalkan'&&isRefunded(x)?paid(x):0)}
+function norm(s){return String(s||'').toLowerCase().trim()}
+function badge(text,kind){return `<span class="badge b-${kind}">${esc(text)}</span>`}
+function statusBadge(x){let s=work(x),k=norm(s)==='sudah diambil'?'green':norm(s)==='dibatalkan'?'red':norm(s)==='selesai'?'blue':'yellow';return badge(s,k)}
+function payBadge(x){return badge(payStatus(x),norm(payStatus(x))==='lunas'?'green':'yellow')}
+function refundBadge(x){let s=refundStatus(x);return badge(s,norm(s).includes('sudah')||norm(s)==='dikembalikan'?'green':norm(work(x))==='dibatalkan'&&paid(x)>0?'red':'gray')}
+function dateText(v){if(!v)return '-';let d=new Date(v);return isNaN(d)?String(v).slice(0,10):d.toLocaleDateString('id-ID')}
+function notice(msg,error=false){$('notice').style.display='block';$('notice').style.background=error?'#ffe4e4':'#fff5cc';$('notice').style.borderColor=error?'#e5aaaa':'#efd56a';$('notice').textContent=msg;window.scrollTo({top:0,behavior:'smooth'})}
+async function get(action){const r=await fetch(API+'?action='+encodeURIComponent(action)+'&t='+Date.now());const j=await r.json();if(!j.ok)throw Error(j.message||'Gagal membaca data');return j}
+async function post(payload){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const j=await r.json();if(!j.ok)throw Error(j.message||'Permintaan gagal');return j}
+async function loadData(){if(busy)return;busy=true;$('tbody').innerHTML='<tr><td colspan="10" class="loading">Memuat data dari Google Spreadsheet...</td></tr>';try{const j=await get('servis');data=Array.isArray(j.data)?j.data:[];render();$('notice').style.display='none'}catch(e){$('tbody').innerHTML=`<tr><td colspan="10" class="empty">${esc(e.message)}</td></tr>`;notice('Gagal memuat data: '+e.message,true)}finally{busy=false}}
+function render(){const q=norm($('search').value),fw=norm($('filterWork').value),fp=norm($('filterPay').value);const list=data.filter(x=>{const text=norm([val(x,'ID Servis'),val(x,'Nama Pelanggan'),val(x,'WhatsApp'),val(x,'Model HP'),val(x,'Keluhan')].join(' '));return (!q||text.includes(q))&&(!fw||norm(work(x))===fw)&&(!fp||norm(payStatus(x))===fp)});$('count').textContent=list.length;$('receivable').textContent=money(list.reduce((s,x)=>s+remain(x),0));const totalPaid=list.reduce((s,x)=>s+paid(x),0);const totalRefunded=list.reduce((s,x)=>s+refundAmount(x),0);$('paid').textContent=money(Math.max(0,totalPaid-totalRefunded));$('refund').textContent=money(list.filter(x=>norm(work(x))==='dibatalkan'&&!isRefunded(x)&&paid(x)>0&&!norm(refundStatus(x)).includes('tidak diperlukan')).reduce((s,x)=>s+paid(x),0));$('refunded').textContent=money(totalRefunded);
+if(!list.length){$('tbody').innerHTML='<tr><td colspan="10" class="empty">Tidak ada data servis yang cocok.</td></tr>';return}
+$('tbody').innerHTML=list.map(x=>{const id=String(val(x,'ID Servis'));const customer=val(x,'Nama Pelanggan')||'-';const phone=String(val(x,'WhatsApp'));const model=val(x,'Model HP')||'-';const refundEligible=norm(work(x))==='dibatalkan'&&paid(x)>0&&!norm(refundStatus(x)).includes('sudah')&&!norm(refundStatus(x)).includes('dikembalikan');return `<tr>
+<td><b>${esc(id)}</b><div class="sub">${esc(dateText(val(x,'Tanggal')))}</div></td>
+<td><b>${esc(customer)}</b><div class="sub">${esc(phone||'No. WA tidak tersedia')}</div></td>
+<td><b>${esc(model)}</b><div class="sub">${esc(val(x,'Keluhan')||'-')}</div></td>
+<td><b>${money(total(x))}</b></td><td>${money(paid(x))}</td><td>${money(remain(x))}</td>
+<td>${payBadge(x)}</td><td>${statusBadge(x)}</td><td>${refundBadge(x)}</td>
+<td class="actions"><button class="small primary" onclick="detail('${esc(id)}')">Detail / Aksi</button></td>
+</tr>`}).join('')}
+function find(id){return data.find(x=>String(val(x,'ID Servis'))===String(id))}
+function detail(id){
+ const x=find(id);if(!x)return;
+ const fields=[['ID Servis',val(x,'ID Servis')],['Tanggal',dateText(val(x,'Tanggal'))],['Nama Pelanggan',val(x,'Nama Pelanggan')],['WhatsApp',val(x,'WhatsApp')],['Model HP',val(x,'Model HP')],['IMEI',val(x,'IMEI')],['Keluhan',val(x,'Keluhan')],['Biaya Jasa',money(val(x,'Biaya Jasa'))],['Teknisi',val(x,'Teknisi')],['Sparepart',val(x,'Sparepart JSON')],['Total Tagihan',money(total(x))],['Total Dibayar',money(paid(x))],['Sisa Piutang',money(remain(x))],['Status Pembayaran',payStatus(x)],['Status Pengerjaan',work(x)],['Catatan Pengerjaan',val(x,'Catatan Pengerjaan')||'-'],['Status Pengembalian DP',refundStatus(x)],['Catatan Internal',val(x,'Catatan Internal')||'-']];
+ $('detailBody').innerHTML='<div class="detail-grid">'+fields.map(a=>`<b>${esc(a[0])}</b><span>${esc(a[1]||'-')}</span>`).join('')+'</div>';
+ const idSafe=String(val(x,'ID Servis'));
+ const buttons=[`<button class="blue" onclick="closeModal('detailModal');openStatus('${esc(idSafe)}')">Proses / Ubah Status</button>`];
+ if(val(x,'WhatsApp'))buttons.push(`<button class="dark" onclick="whatsapp('${esc(idSafe)}')">WhatsApp</button>`);
+ if(norm(work(x))==='dibatalkan'&&paid(x)>0&&!isRefunded(x)&&!norm(refundStatus(x)).includes('tidak diperlukan'))buttons.push(`<button class="red" onclick="closeModal('detailModal');openRefund('${esc(idSafe)}')">Kembalikan DP</button>`);
+ buttons.push(`<button class="red" onclick="deleteService('${esc(idSafe)}')">Hapus Data Servis</button>`);
+ $('detailActions').innerHTML=buttons.join('');
+ $('detailModal').classList.add('show');
+}
+async function deleteService(id){
+ const x=find(id);if(!x)return;
+ const typed=prompt('Untuk menghapus transaksi ini secara permanen, ketik HAPUS.\nID Servis: '+id);
+ if(typed===null)return;
+ if(typed.trim().toUpperCase()!=='HAPUS'){notice('Penghapusan dibatalkan: teks konfirmasi tidak cocok.',true);return;}
+ if(!confirm('Yakin hapus servis '+id+' beserta data terkait yang didukung backend? Tindakan ini tidak dapat dibatalkan.'))return;
+ try{
+  const j=await post({action:'hapustransaksi',idServis:id,id:id,jenis:'servis',konfirmasi:'KONFIRMASI HAPUS'});
+  closeModal('detailModal');notice(j.message||'Data servis berhasil dihapus.');await loadData();
+ }catch(e){notice('Gagal menghapus data servis: '+e.message,true)}
+}
+function openStatus(id){const x=find(id);if(!x)return;$('statusId').value=id;$('workStatus').value=work(x);$('workNote').value=val(x,'Catatan Pengerjaan')||'';$('statusModal').classList.add('show')}
+async function saveWorkStatus(){const id=$('statusId').value,status=$('workStatus').value,catatan=$('workNote').value;const x=find(id);if(!x)return;if(status==='Sudah Diambil'&&!confirm('Ubah menjadi SUDAH DIAMBIL? Sistem akan otomatis menganggap seluruh tagihan LUNAS dan mencatat pelunasan saat pengambilan.'))return;if(status==='Dibatalkan'&&!confirm('Batalkan servis ini? Pastikan pengembalian seluruh uang yang diterima akan dicatat setelah benar-benar dibayarkan.'))return;try{const j=await post({action:'ubahstatusservis',idServis:id,statusPengerjaan:status,catatanPengerjaan:catatan});closeModal('statusModal');notice(j.message||'Status pengerjaan diperbarui.');await loadData()}catch(e){notice('Gagal mengubah status: '+e.message,true)}}
+function numInput(v){const n=Number(v);return Number.isFinite(n)?n:0}
+function openRefund(id){const x=find(id);if(!x)return;if(norm(work(x))!=='dibatalkan'){notice('Pengembalian hanya tersedia untuk servis yang dibatalkan.',true);return}if(norm(refundStatus(x)).includes('sudah')||norm(refundStatus(x))==='dikembalikan'){notice('Pengembalian sudah tercatat.',true);return}$('refundId').value=id;$('refundAmount').value=paid(x);$('refundAmount').max=paid(x);$('refundNote').value='';$('refundInfo').textContent=`${val(x,'Nama Pelanggan')} • Uang diterima tercatat ${money(paid(x))}. Backend harus mencatat pengembalian secara penuh.`;$('refundModal').classList.add('show')}
+async function saveRefund(){const id=$('refundId').value,x=find(id),nominal=numInput($('refundAmount').value);if(!x)return;if(nominal!==paid(x)){notice('Nominal pengembalian harus sama dengan total uang yang tercatat diterima: '+money(paid(x)),true);return}if(!confirm('Pastikan uang benar-benar sudah dikembalikan kepada pelanggan. Simpan pencatatan pengembalian sekarang?'))return;try{const j=await post({action:'kembalikanDP',idServis:id,nominal,metode:$('refundMethod').value,catatan:$('refundNote').value});closeModal('refundModal');notice(j.message||'Pengembalian dicatat.');await loadData()}catch(e){notice('Pengembalian gagal: '+e.message,true)}}
+function whatsapp(id){const x=find(id);if(!x)return;const phone=String(val(x,'WhatsApp')).replace(/\D/g,'').replace(/^0/,'62');if(!phone){notice('Nomor WhatsApp tidak tersedia.',true);return}const msg=`Halo ${val(x,'Nama Pelanggan')||'Kak'}, informasi servis FIXZY:\nID Servis: ${val(x,'ID Servis')}\nHP: ${val(x,'Model HP')}\nStatus pengerjaan: ${work(x)}\nTotal tagihan: ${money(total(x))}\nSudah dibayar: ${money(paid(x))}\nSisa tagihan: ${money(remain(x))}\nTerima kasih.`;window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank','noopener')}
+function closeModal(id){$(id).classList.remove('show')}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+let salesData=[],salesBusy=false,activeTransactionView='servis';
+function showTransactionView(which){activeTransactionView=which;const servicePanel=$('servicePanel'),salesPanel=$('salesPanel'),cards=document.querySelector('.cards'),filterWork=$('filterWork');const isSales=which==='penjualan';if(servicePanel)servicePanel.style.display=isSales?'none':'';if(salesPanel)salesPanel.style.display=isSales?'':'none';if(cards)cards.style.display=isSales?'none':'';if(filterWork)filterWork.style.display=isSales?'none':'';const title=document.querySelector('.brand h1 span');if(title)title.textContent=isSales?'| DATA PENJUALAN':'| DATA SERVIS';const subtitle=document.querySelector('.brand p');if(subtitle)subtitle.textContent=isSales?'Pengelolaan transaksi penjualan dan pembayaran':'Pengelolaan pengerjaan, pembayaran, dan pengembalian DP';const search=$('search');if(search)search.placeholder=isSales?'Cari ID penjualan, pelanggan, WhatsApp, atau barang...':'Cari ID servis, pelanggan, WhatsApp, atau model HP...';if(isSales)loadSales();else render();}
+function parseItems(row){let raw=val(row,'Items JSON','Barang JSON','Produk JSON','Detail JSON','Daftar Barang','Items','Detail Produk','Rincian Produk');if(!raw)return val(row,'Nama Produk','Produk','Keterangan')||'Penjualan barang';try{const a=Array.isArray(raw)?raw:JSON.parse(String(raw));if(Array.isArray(a))return a.map(i=>`${val(i,'namaProduk','Nama Produk','nama','produk','kodeProduk','kode')||'-'} × ${num(val(i,'qty','Qty','jumlah','Jumlah'))}`).join(', ')||'Penjualan barang'}catch(e){return String(raw)}return String(raw)}
+async function loadSales(){if(salesBusy)return;salesBusy=true;$('salesTbody').innerHTML='<tr><td colspan="9" class="loading">Memuat data penjualan...</td></tr>';try{const j=await get('penjualan');salesData=Array.isArray(j.data)?j.data:[];renderSales();}catch(e){$('salesTbody').innerHTML=`<tr><td colspan="9" class="empty">Gagal memuat penjualan: ${esc(e.message)}</td></tr>`;notice('Data servis tetap tersedia. Gagal memuat data penjualan: '+e.message,true)}finally{salesBusy=false}}
+function renderSales(){const q=norm($('search').value);const fw=norm($('filterPay').value);const list=salesData.filter(x=>{const txt=norm([val(x,'ID Penjualan','ID','No. Transaksi'),val(x,'Nama Pelanggan','Pelanggan','Nama'),val(x,'WhatsApp','WA','Nomor WhatsApp'),parseItems(x)].join(' '));const rem=Math.max(0,num(val(x,'Sisa Piutang','Sisa Tagihan','Sisa Pembayaran','Sisa'))||total(x)-paid(x));const ps=norm(val(x,'Status Pembayaran','Status Bayar','Status')||(rem<=0?'Lunas':'Belum Lunas'));return(!q||txt.includes(q))&&(!fw||ps===fw)});if(!list.length){$('salesTbody').innerHTML='<tr><td colspan="9" class="empty">Belum ada data penjualan yang cocok.</td></tr>';return}$('salesTbody').innerHTML=list.map(x=>{const id=String(val(x,'ID Penjualan','ID','No. Transaksi')||'-');const t=total(x),p=paid(x),r=Math.max(0,num(val(x,'Sisa Piutang','Sisa Tagihan','Sisa Pembayaran','Sisa'))||t-p),ps=String(val(x,'Status Pembayaran','Status Bayar','Status')||(r<=0?'Lunas':'Belum Lunas'));return `<tr><td><b>${esc(id)}</b><div class="sub">${esc(dateText(val(x,'Tanggal','Tanggal Transaksi','TanggalTransaksi','Waktu','Timestamp')))}</div></td><td><b>${esc(val(x,'Nama Pelanggan','Pelanggan','Nama')||'-')}</b><div class="sub">${esc(val(x,'WhatsApp','WA','Nomor WhatsApp')||'No. WA tidak tersedia')}</div></td><td>${esc(parseItems(x))}</td><td><b>${money(t)}</b></td><td>${money(p)}</td><td>${money(r)}</td><td>${badgeForSales(ps)}</td><td>${esc(val(x,'Status Transaksi','Status Penjualan')||ps)}</td><td><button class="small primary" onclick="detailSale('${esc(id)}')">Detail</button></td></tr>`}).join('')}
+function badgeForSales(s){const kind=norm(s)==='lunas'?'green':'yellow';return `<span class="badge b-${kind}">${esc(s)}</span>`}
+function detailSale(id){const x=salesData.find(r=>String(val(r,'ID Penjualan','ID','No. Transaksi')||'-')===String(id));if(!x)return;const entries=Object.entries(x).filter(([k,v])=>v!==''&&v!==null&&v!==undefined);$('detailBody').innerHTML='<div class="detail-grid">'+entries.map(([k,v])=>`<b>${esc(k)}</b><span>${esc(typeof v==='object'?JSON.stringify(v):v)}</span>`).join('')+'</div>';document.querySelector('#detailModal .dialog-head h3').textContent='Detail Penjualan';$('detailActions').innerHTML='';$('detailModal').classList.add('show')}
+const originalCloseModal=closeModal;function closeModal(id){originalCloseModal(id);if(id==='detailModal')document.querySelector('#detailModal .dialog-head h3').textContent='Detail Servis & Aksi'}
+const originalLoadData=loadData;
+loadData();
+</script>
+</body>
 </html>
