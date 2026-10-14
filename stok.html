@@ -89,34 +89,59 @@ function csvUrl(raw){
 }
 function parseCSV(text){const out=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){cell+='"';i++}else quoted=!quoted}else if(c===','&&!quoted){row.push(cell.trim());cell=''}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell.trim());if(row.some(v=>v!==''))out.push(row);row=[];cell=''}else cell+=c}row.push(cell.trim());if(row.some(v=>v!==''))out.push(row);return out}
 function normHead(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'')}
+function numberFromCell(value){
+ let s=String(value??'').trim(); if(!s)return 0;
+ // Hapus simbol mata uang, spasi, dan karakter selain angka/pemisah.
+ s=s.replace(/\s/g,'').replace(/rp/ig,'').replace(/[^0-9,.-]/g,'');
+ if(!s||s==='-'||s===','||s==='.')return 0;
+ // Format Indonesia: 15.000 atau 15.000,50; format internasional: 15,000.50.
+ if(s.includes('.')&&s.includes(',')){
+   if(s.lastIndexOf(',')>s.lastIndexOf('.')) s=s.replace(/\./g,'').replace(',','.');
+   else s=s.replace(/,/g,'');
+ }else if(s.includes(',')){
+   const parts=s.split(','); s=parts.length>1&&parts[parts.length-1].length<=2?parts.slice(0,-1).join('')+'.'+parts.at(-1):s.replace(/,/g,'');
+ }else if((s.match(/\./g)||[]).length>1 || /\.\d{3}$/.test(s)) s=s.replace(/\./g,'');
+ const n=Number(s);return Number.isFinite(n)?n:0;
+}
 function mapCSV(rows){
  if(!rows.length)return [];
- // Hanya baca kolom yang diminta. Kolom lain di spreadsheet sengaja diabaikan.
  const aliases={
   code:['kode','kodeproduk','kodebarang','sku'],
   name:['produk','namaproduk','namabarang','nama'],
-  cost:['hargamodal','modal','modalsatuan','hargabeli'],
-  price:['hargajual','harga jual','price'],
-  stock:['stock','stok','jumlahstok','qty']
+  cost:['hargamodal','modal','modalsatuan','hargabeli','harga pokok'],
+  price:['hargajual','jual','price'],
+  stock:['stock','stok','jumlahstok','qty','jumlah']
  };
- const first=rows[0].map(normHead),idx={};
- Object.entries(aliases).forEach(([key,names])=>{idx[key]=first.findIndex(h=>names.includes(h));});
- // Jika tidak ada header yang cocok, jangan menebak berdasarkan urutan kolom.
- if(idx.name<0)throw Error('Kolom Produk tidak ditemukan. Pastikan ada header bernama Produk atau Nama Produk.');
- const hasHeader=Object.values(idx).some(i=>i>=0);
- const body=hasHeader?rows.slice(1):rows;
- return body.map(r=>({
-  kodeProduk:idx.code>=0?String(r[idx.code]||'').trim():'',
-  namaProduk:idx.name>=0?String(r[idx.name]||'').trim():'',
-  modal:idx.cost>=0?num(r[idx.cost]||0):0,
-  hargaJual:idx.price>=0?num(r[idx.price]||0):0,
-  stokAwal:idx.stock>=0?num(r[idx.stock]||0):0,
-  stokMinimum:0,kategori:'',merek:'',supplier:''
- })).filter(x=>x.namaProduk);
+ // Cari baris header di seluruh awal sheet, bukan menganggap baris pertama selalu header.
+ let headerIndex=-1,idx={};
+ for(let ri=0;ri<Math.min(rows.length,30);ri++){
+   const headers=rows[ri].map(normHead),candidate={};
+   Object.entries(aliases).forEach(([key,names])=>{candidate[key]=headers.findIndex(h=>names.includes(h));});
+   if(candidate.name>=0 && (candidate.cost>=0||candidate.price>=0||candidate.stock>=0||candidate.code>=0)){
+     headerIndex=ri;idx=candidate;break;
+   }
+ }
+ if(headerIndex<0)throw Error('Header kolom tidak ditemukan. Pastikan ada kolom Kode, Produk, Harga Modal, Harga Jual, dan Stock/Stok.');
+ const cleanName=v=>String(v??'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
+ const seen=new Set(),products=[];
+ for(const r of rows.slice(headerIndex+1)){
+   const namaProduk=idx.name>=0?cleanName(r[idx.name]):'';
+   if(!namaProduk)continue; // Abaikan baris kosong
+   const kodeProduk=idx.code>=0?cleanName(r[idx.code]):'';
+   const modal=idx.cost>=0?numberFromCell(r[idx.cost]):0;
+   const hargaJual=idx.price>=0?numberFromCell(r[idx.price]):0;
+   const stokAwal=idx.stock>=0?numberFromCell(r[idx.stock]):0;
+   // Abaikan baris judul/catatan yang nyasar dan baris yang seluruh nilai datanya kosong.
+   if(!kodeProduk && !modal && !hargaJual && !stokAwal && !/[a-zA-Z]/.test(namaProduk))continue;
+   const key=(kodeProduk||namaProduk).toLocaleLowerCase('id-ID');
+   if(seen.has(key))continue; seen.add(key);
+   products.push({kodeProduk,namaProduk,modal,hargaJual,stokAwal,stokMinimum:0,kategori:'',merek:'',supplier:''});
+ }
+ return products;
 }
-async function previewLink(){const raw=$('#sheetLink').value.trim();if(!raw){message('#linkMessage','Masukkan link Google Spreadsheet terlebih dahulu.');return}$('#previewLinkBtn').disabled=true;$('#importLinkBtn').disabled=true;message('#linkMessage','Sedang membaca spreadsheet...');try{const url=csvUrl(raw);const response=await fetch(url,{cache:'no-store'});if(!response.ok)throw Error('Spreadsheet tidak dapat dibaca. Periksa akses berbagi/publikasi link.');const text=await response.text();if(/<html|accounts.google.com|sign in/i.test(text.slice(0,500)))throw Error('Link masih meminta login. Publikasikan sheet sebagai CSV atau ubah akses agar dapat dibaca.');const rows=parseCSV(text);linkProducts=mapCSV(rows);if(!linkProducts.length)throw Error('Tidak ditemukan baris produk. Pastikan kolom Nama Produk ada di kolom B atau gunakan header yang sesuai.');$('#linkPreview').innerHTML=`<div class="notice"><b>Pratinjau berhasil: ${linkProducts.length} produk ditemukan.</b><p>Periksa nama dan harga sebelum menyimpan. Produk akan ditambahkan ke sheet Produk FIXZY; produk yang sudah ada tidak otomatis diperbarui.</p></div><div class="table-wrap"><table><thead><tr><th>Kode</th><th>Produk</th><th>Harga Modal</th><th>Harga Jual</th><th>Stock</th><th>Modal</th><th>Harga Jual</th></tr></thead><tbody>${linkProducts.slice(0,12).map(x=>`<tr><td>${esc(x.kodeProduk||'(otomatis)')}</td><td>${esc(x.namaProduk)}</td><td>${money(x.modal)}</td><td>${money(x.hargaJual)}</td><td>${esc(x.stokAwal)}</td></tr>`).join('')}</tbody></table></div>${linkProducts.length>12?`<p class="sub">Menampilkan 12 dari ${linkProducts.length} produk.</p>`:''}`;$('#importLinkBtn').disabled=false;message('#linkMessage','Link berhasil dibaca. Klik “Simpan Produk ke Stok FIXZY” untuk mengimpor.')}catch(e){linkProducts=[];$('#linkPreview').innerHTML='';message('#linkMessage',e.message);toast(e.message)}finally{$('#previewLinkBtn').disabled=false}}
+async function previewLink(){const raw=$('#sheetLink').value.trim();if(!raw){message('#linkMessage','Masukkan link Google Spreadsheet terlebih dahulu.');return}$('#previewLinkBtn').disabled=true;$('#importLinkBtn').disabled=true;message('#linkMessage','Sedang membaca spreadsheet...');try{const url=csvUrl(raw);const response=await fetch(url,{cache:'no-store'});if(!response.ok)throw Error('Spreadsheet tidak dapat dibaca. Periksa akses berbagi/publikasi link.');const text=await response.text();if(/<html|accounts.google.com|sign in/i.test(text.slice(0,500)))throw Error('Link masih meminta login. Publikasikan sheet sebagai CSV atau ubah akses agar dapat dibaca.');const rows=parseCSV(text);linkProducts=mapCSV(rows);if(!linkProducts.length)throw Error('Tidak ditemukan baris produk. Pastikan kolom Nama Produk ada di kolom B atau gunakan header yang sesuai.');$('#linkPreview').innerHTML=`<div class="notice"><b>Pratinjau berhasil: ${linkProducts.length} produk ditemukan.</b><p>Periksa nama dan harga sebelum menyimpan. Produk akan ditambahkan ke sheet Produk FIXZY; produk yang sudah ada tidak otomatis diperbarui.</p></div><div class="table-wrap"><table><thead><tr><th>Kode</th><th>Produk</th><th>Harga Modal</th><th>Harga Jual</th><th>Stock</th></tr></thead><tbody>${linkProducts.slice(0,12).map(x=>`<tr><td>${esc(x.kodeProduk||'(otomatis)')}</td><td>${esc(x.namaProduk)}</td><td>${money(x.modal)}</td><td>${money(x.hargaJual)}</td><td>${esc(x.stokAwal)}</td></tr>`).join('')}</tbody></table></div>${linkProducts.length>12?`<p class="sub">Menampilkan 12 dari ${linkProducts.length} produk.</p>`:''}`;$('#importLinkBtn').disabled=false;message('#linkMessage','Link berhasil dibaca. Klik “Simpan Produk ke Stok FIXZY” untuk mengimpor.')}catch(e){linkProducts=[];$('#linkPreview').innerHTML='';message('#linkMessage',e.message);toast(e.message)}finally{$('#previewLinkBtn').disabled=false}}
 async function saveLink(){const raw=$('#sheetLink').value.trim();if(!raw){message('#linkMessage','Masukkan link terlebih dahulu.');return}try{csvUrl(raw);localStorage.setItem('FIXZY_STOK_SHEET_LINK',raw);message('#linkMessage','Link disimpan. Sedang membaca daftar produk...');toast('Link spreadsheet disimpan');await previewLink();if(linkProducts.length){await loadStock();message('#linkMessage',`Link tersimpan. ${linkProducts.length} produk dari spreadsheet sudah ditampilkan di Daftar Stok. Untuk memasukkannya juga ke database FIXZY, klik “Simpan Produk ke Stok FIXZY”.`)}}catch(e){message('#linkMessage',e.message);toast(e.message)}}
 async function importLinkProducts(){if(!linkProducts.length){message('#linkMessage','Baca dan pratinjau link terlebih dahulu.');return}if(!confirm(`Simpan ${linkProducts.length} produk ke Google Spreadsheet FIXZY? Produk akan ditambahkan, tidak menimpa produk lama.`))return;const btn=$('#importLinkBtn');btn.disabled=true;let ok=0,failed=[];for(let i=0;i<linkProducts.length;i++){const x={...linkProducts[i],action:'createproduk'};if(!x.kodeProduk)x.kodeProduk='';try{await apiPost(x);ok++;message('#linkMessage',`Menyimpan ${i+1}/${linkProducts.length} produk...`)}catch(e){failed.push(`${x.namaProduk}: ${e.message}`)}}await loadStock();btn.disabled=false;message('#linkMessage',`Selesai. Berhasil ${ok} produk; gagal ${failed.length}.${failed.length?' Kesalahan pertama: '+failed[0]:''}`);if(ok)toast(`${ok} produk berhasil disimpan ke stok FIXZY`)}
 async function checkApi(){const s=$('#apiStatus');if(!s)return;try{await apiGet('ping');s.textContent='API terhubung';s.className='pill ok'}catch(e){s.textContent='API belum disetel';s.className='pill bad'}}
 
-$('#productForm').addEventListener('submit',async e=>{e.preventDefault();const d=formObj(e.currentTarget);d.action='createproduk';['stokAwal','stokMinimum','modal','hargaJual'].forEach(k=>d[k]=Number(d[k]||0));try{const j=await apiPost(d);message('#productMessage',`${j.message} Kode: ${j.kodeProduk}`);e.currentTarget.reset();await loadStock();toast('Produk tersimpan')}catch(err){message('#productMessage',err.message)}});async function loadStock(){let rows=[];let apiError='';try{rows=(await apiGet('stok')).data||[]}catch(e){apiError=e.message}const norm=s=>String(s||'').trim().toLowerCase();const seen=new Set(rows.map(p=>norm(p['Kode Produk'])||norm(p['Nama Produk'])));const external=(linkProducts||[]).filter(x=>!seen.has(norm(x.kodeProduk)||norm(x.namaProduk))).map(x=>({'Kode Produk':x.kodeProduk||'—','Nama Produk':x.namaProduk,'Stok':x.stokAwal,'Modal Satuan':x.modal,'Harga Jual':x.hargaJual,__source:'Spreadsheet'}));const combined=[...rows.map(p=>({...p,__source:'FIXZY'})),...external];$('#stockRows').innerHTML=combined.length?combined.map(p=>`<tr><td>${esc(p['Kode Produk'])}</td><td>${esc(p['Nama Produk'])}</td><td>${esc(p.Stok)}</td><td>${money(p['Modal Satuan'])}</td><td>${money(p['Harga Jual'])}</td><td><span class="pill ${p.__source==='Spreadsheet'?'muted':'ok'}">${p.__source==='Spreadsheet'?'Link Spreadsheet':'Database FIXZY'}</span></td></tr>`).join(''):`<tr><td colspan="6" class="empty">${esc(apiError||'Belum ada produk. Simpan link spreadsheet untuk membaca produk.')}</td></tr>`}$('#loadStockBtn').addEventListener('click',loadStock);$('#previewLinkBtn').addEventListener('click',previewLink);$('#saveLinkBtn').addEventListener('click',saveLink);$('#importLinkBtn').addEventListener('click',importLinkProducts);$('#sheetLink').value=localStorage.getItem('FIXZY_STOK_SHEET_LINK')||'';checkApi();(async()=>{const saved=$('#sheetLink').value.trim();if(saved){try{await previewLink()}catch(e){console.error(e)}}await loadStock()})();</script></body></html>
+$('#productForm').addEventListener('submit',async e=>{e.preventDefault();const d=formObj(e.currentTarget);d.action='createproduk';['stokAwal','stokMinimum','modal','hargaJual'].forEach(k=>d[k]=Number(d[k]||0));try{const j=await apiPost(d);message('#productMessage',`${j.message} Kode: ${j.kodeProduk}`);e.currentTarget.reset();await loadStock();toast('Produk tersimpan')}catch(err){message('#productMessage',err.message)}});async function loadStock(){let rows=[];let apiError='';try{rows=(await apiGet('stok')).data||[]}catch(e){apiError=e.message}const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();const validRows=rows.filter(p=>norm(p['Nama Produk']||p.namaProduk));const seen=new Set(validRows.map(p=>norm(p['Kode Produk'])||norm(p['Nama Produk'])));const external=(linkProducts||[]).filter(x=>norm(x.namaProduk)&&!seen.has(norm(x.kodeProduk)||norm(x.namaProduk))).map(x=>({'Kode Produk':x.kodeProduk||'—','Nama Produk':x.namaProduk,'Stok':x.stokAwal,'Modal Satuan':x.modal,'Harga Jual':x.hargaJual,__source:'Spreadsheet'}));const combined=[...validRows.map(p=>({...p,__source:'FIXZY'})),...external];$('#stockRows').innerHTML=combined.length?combined.map(p=>`<tr><td>${esc(p['Kode Produk'])}</td><td>${esc(p['Nama Produk'])}</td><td>${esc(p.Stok)}</td><td>${money(p['Modal Satuan'])}</td><td>${money(p['Harga Jual'])}</td><td><span class="pill ${p.__source==='Spreadsheet'?'muted':'ok'}">${p.__source==='Spreadsheet'?'Link Spreadsheet':'Database FIXZY'}</span></td></tr>`).join(''):`<tr><td colspan="6" class="empty">${esc(apiError||'Belum ada produk. Simpan link spreadsheet untuk membaca produk.')}</td></tr>`}$('#loadStockBtn').addEventListener('click',loadStock);$('#previewLinkBtn').addEventListener('click',previewLink);$('#saveLinkBtn').addEventListener('click',saveLink);$('#importLinkBtn').addEventListener('click',importLinkProducts);$('#sheetLink').value=localStorage.getItem('FIXZY_STOK_SHEET_LINK')||'';checkApi();(async()=>{const saved=$('#sheetLink').value.trim();if(saved){try{await previewLink()}catch(e){console.error(e)}}await loadStock()})();</script></body></html>
