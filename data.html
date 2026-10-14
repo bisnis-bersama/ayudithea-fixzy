@@ -86,7 +86,7 @@ $('tbody').innerHTML=list.map(x=>{const id=String(val(x,'ID Servis'));const cust
 <td><b>${esc(model)}</b><div class="sub">${esc(val(x,'Keluhan')||'-')}</div></td>
 <td><b>${money(total(x))}</b></td><td>${money(paid(x))}</td><td>${money(remain(x))}</td>
 <td>${payBadge(x)}</td><td>${statusBadge(x)}</td><td>${refundBadge(x)}</td>
-<td class="actions"><button class="small light" onclick="detail('${esc(id)}')">Detail</button><button class="small blue" onclick="openStatus('${esc(id)}')">Proses</button>${phone?`<button class="small dark" onclick="whatsapp('${esc(id)}')">WhatsApp</button>`:''}${refundEligible?`<button class="small red" onclick="openRefund('${esc(id)}')">Kembalikan DP</button>`:''}</td>
+<td class="actions"><button class="small light" onclick="detail('${esc(id)}')">Detail</button><button class="small blue" onclick="openStatus('${esc(id)}')">Proses</button>${phone?`<button class="small dark" onclick="whatsapp('${esc(id)}')">WhatsApp</button>`:''}${refundEligible?`<button class="small red" onclick="openRefund('${esc(id)}')">Kembalikan DP</button>`:''}<button class="small red" onclick="deleteService('${esc(id)}')">Hapus</button></td>
 </tr>`}).join('')}
 function find(id){return data.find(x=>String(val(x,'ID Servis'))===String(id))}
 function detail(id){const x=find(id);if(!x)return;const fields=[['ID Servis',val(x,'ID Servis')],['Tanggal',dateText(val(x,'Tanggal'))],['Nama Pelanggan',val(x,'Nama Pelanggan')],['WhatsApp',val(x,'WhatsApp')],['Model HP',val(x,'Model HP')],['IMEI',val(x,'IMEI')],['Keluhan',val(x,'Keluhan')],['Biaya Jasa',money(val(x,'Biaya Jasa'))],['Teknisi',val(x,'Teknisi')],['Sparepart',val(x,'Sparepart JSON')],['Total Tagihan',money(total(x))],['Total Dibayar',money(paid(x))],['Sisa Piutang',money(remain(x))],['Status Pembayaran',payStatus(x)],['Status Pengerjaan',work(x)],['Catatan Pengerjaan',val(x,'Catatan Pengerjaan')||'-'],['Status Pengembalian DP',refundStatus(x)],['Catatan Internal',val(x,'Catatan Internal')||'-']];$('detailBody').innerHTML='<div class="detail-grid">'+fields.map(a=>`<b>${esc(a[0])}</b><span>${esc(a[1]||'-')}</span>`).join('')+'</div>';$('detailModal').classList.add('show')}
@@ -95,6 +95,25 @@ async function saveWorkStatus(){const id=$('statusId').value,status=$('workStatu
 function numInput(v){const n=Number(v);return Number.isFinite(n)?n:0}
 function openRefund(id){const x=find(id);if(!x)return;if(norm(work(x))!=='dibatalkan'){notice('Pengembalian hanya tersedia untuk servis yang dibatalkan.',true);return}if(norm(refundStatus(x)).includes('sudah')||norm(refundStatus(x))==='dikembalikan'){notice('Pengembalian sudah tercatat.',true);return}$('refundId').value=id;$('refundAmount').value=paid(x);$('refundAmount').max=paid(x);$('refundNote').value='';$('refundInfo').textContent=`${val(x,'Nama Pelanggan')} • Uang diterima tercatat ${money(paid(x))}. Backend harus mencatat pengembalian secara penuh.`;$('refundModal').classList.add('show')}
 async function saveRefund(){const id=$('refundId').value,x=find(id),nominal=numInput($('refundAmount').value);if(!x)return;if(nominal!==paid(x)){notice('Nominal pengembalian harus sama dengan total uang yang tercatat diterima: '+money(paid(x)),true);return}if(!confirm('Pastikan uang benar-benar sudah dikembalikan kepada pelanggan. Simpan pencatatan pengembalian sekarang?'))return;try{const j=await post({action:'kembalikanDP',idServis:id,nominal,metode:$('refundMethod').value,catatan:$('refundNote').value});closeModal('refundModal');notice(j.message||'Pengembalian dicatat.');await loadData()}catch(e){notice('Pengembalian gagal: '+e.message,true)}}
+async function deleteService(id){
+  const x=find(id);if(!x)return;
+  const customer=String(val(x,'Nama Pelanggan')||'tanpa nama');
+  const typed=prompt(
+    `HAPUS PERMANEN DATA SERVIS?\n\nID: ${id}\nPelanggan: ${customer}\n\nData servis beserta riwayat pembayaran/pengembalian terkait akan dihapus.\nTindakan ini tidak dapat dibatalkan.\n\nKetik HAPUS untuk melanjutkan:`
+  );
+  if(typed===null)return;
+  if(typed.trim().toUpperCase()!=='HAPUS'){
+    notice('Penghapusan dibatalkan. Teks konfirmasi tidak sesuai.',true);return;
+  }
+  const confirmSecond=confirm(`Konfirmasi terakhir: hapus permanen servis ${id}?`);
+  if(!confirmSecond)return;
+  try{
+    const j=await post({action:'hapustransaksi',jenis:'servis',id:id,konfirmasi:'KONFIRMASI HAPUS'});
+    notice(j.message||'Data servis berhasil dihapus.');
+    await loadData();
+  }catch(e){notice('Gagal menghapus servis: '+e.message,true)}
+}
+
 function normalizeWhatsApp(raw){
   let p=String(raw??'').trim();
   if(!p)return '';
@@ -120,31 +139,7 @@ function whatsapp(id){
     notice('Nomor WhatsApp pelanggan kosong atau formatnya tidak valid. Periksa kolom WhatsApp pada data servis: '+String(raw||'(kosong)'),true);
     return;
   }
-  const customerName=String(val(x,'Nama Pelanggan')||'').trim();
-  const greetingName=customerName ? 'Kak '+customerName : 'Kak';
-  const serviceId=val(x,'ID Servis')||'-';
-  const device=val(x,'Model HP')||'-';
-  const status=work(x);
-  const totalText=money(total(x));
-  const paidText=money(paid(x));
-  const remainText=money(remain(x));
-  let msg='';
-
-  if(norm(status)==='masuk'){
-    msg=`*A YUDI THEA | INFORMASI SERVIS HP*\n\nHalo, ${greetingName} 😊\n\nTerima kasih sudah mempercayakan servis HP kepada *A Yudi Thea*.\n\nBerikut informasi servis Kakak:\n\n🧾 ID Servis: ${serviceId}\n📱 HP: ${device}\n🔧 Status: Servis Masuk\n💰 Total Estimasi Biaya: ${totalText}\n💵 DP Dibayar: ${paidText}\n📌 Sisa Estimasi Biaya: ${remainText}\n\nHP Kakak akan kami proses sesuai antrean servis. Kami akan menginformasikan jika ada perkembangan atau kendala selama pengerjaan.\n\nTerima kasih atas kepercayaan Kakak kepada *A Yudi Thea*.\n\nSalam,\n*A Yudi Thea*\nServis HP, Aksesori & Sparepart`;
-  }else if(norm(status)==='proses'){
-    msg=`*A YUDI THEA | UPDATE SERVIS HP*\n\nHalo, ${greetingName} 😊\n\nKami informasikan bahwa HP Kakak:\n\n📱 HP: ${device}\n🧾 ID Servis: ${serviceId}\n🔧 Status: Sedang Dikerjakan\n\nKami sedang melakukan pengerjaan pada HP Kakak. Mohon menunggu informasi selanjutnya dari kami.\n\nTerima kasih sudah mempercayakan servis HP Kakak kepada *A Yudi Thea*.\n\nSalam,\n*A Yudi Thea*\nServis HP, Aksesori & Sparepart`;
-  }else if(norm(status)==='menunggu sparepart'){
-    msg=`*A YUDI THEA | UPDATE SERVIS HP*\n\nHalo, ${greetingName} 😊\n\nKami informasikan perkembangan servis HP Kakak:\n\n📱 HP: ${device}\n🧾 ID Servis: ${serviceId}\n🔧 Status: Menunggu Sparepart\n\nSaat ini pengerjaan masih menunggu ketersediaan sparepart yang dibutuhkan. Kami akan melanjutkan pengerjaan setelah sparepart tersedia.\n\nMohon kesabaran Kakak, ya. Terima kasih atas pengertiannya.\n\nSalam,\n*A Yudi Thea*\nServis HP, Aksesori & Sparepart`;
-  }else if(norm(status)==='selesai'){
-    msg=`*A YUDI THEA | SERVIS SELESAI*\n\nHalo, ${greetingName} 😊\n\nKabar baik! HP Kakak sudah selesai diperbaiki dan bisa diambil.\n\n📱 HP: ${device}\n🧾 ID Servis: ${serviceId}\n💰 Total Biaya Servis: ${totalText}\n💵 DP/Pembayaran Tercatat: ${paidText}\n📌 Sisa Pembayaran: ${remainText}\n\nSilakan datang ke konter *A Yudi Thea* untuk mengambil HP Kakak.\n\nTerima kasih sudah mempercayakan perbaikan HP kepada kami. Semoga HP Kakak kembali normal dan nyaman digunakan.\n\nSalam,\n*A Yudi Thea*\nServis HP, Aksesori & Sparepart`;
-  }else if(norm(status)==='sudah diambil'){
-    msg=`*A YUDI THEA | TERIMA KASIH*\n\nHalo, ${greetingName} 😊\n\nTerima kasih sudah mengambil HP yang telah selesai diperbaiki di *A Yudi Thea*.\n\n📱 HP: ${device}\n🧾 ID Servis: ${serviceId}\n🔧 Status: Sudah Diambil\n\nSemoga HP Kakak kembali normal dan awet digunakan. Jika ada pertanyaan mengenai servis, jangan ragu menghubungi kami.\n\nTerima kasih atas kepercayaan Kakak kepada *A Yudi Thea*. 🙏\n\nSalam,\n*A Yudi Thea*\nServis HP, Aksesori & Sparepart`;
-  }else if(norm(status)==='dibatalkan'){
-    msg=`*A YUDI THEA | INFORMASI SERVIS*\n\nHalo, ${greetingName}.\n\nKami informasikan bahwa servis HP Kakak:\n\n📱 HP: ${device}\n🧾 ID Servis: ${serviceId}\n🔧 Status: Dibatalkan\n\nJika sebelumnya Kakak sudah melakukan pembayaran, pengembalian akan kami proses dan konfirmasikan sesuai jumlah uang yang telah diterima.\n\nMohon hubungi kami jika ada hal yang ingin ditanyakan.\n\nTerima kasih atas pengertian Kakak.\n\nSalam,\n*A Yudi Thea*\nServis HP, Aksesori & Sparepart`;
-  }else{
-    msg=`*A YUDI THEA | UPDATE SERVIS HP*\n\nHalo, ${greetingName} 😊\n\n📱 HP: ${device}\n🧾 ID Servis: ${serviceId}\n🔧 Status: ${status}\n\nTerima kasih sudah mempercayakan servis HP Kakak kepada *A Yudi Thea*.\n\nSalam,\n*A Yudi Thea*\nServis HP, Aksesori & Sparepart`;
-  }
+  const msg=`Halo ${val(x,'Nama Pelanggan')||'Kak'}, informasi servis FIXZY:\nID Servis: ${val(x,'ID Servis')}\nHP: ${val(x,'Model HP')}\nStatus pengerjaan: ${work(x)}\nTotal tagihan: ${money(total(x))}\nSudah dibayar: ${money(paid(x))}\nSisa tagihan: ${money(remain(x))}\nTerima kasih.`;
   const url='https://wa.me/'+phone+'?text='+encodeURIComponent(msg);
   // Navigasi langsung dari klik pengguna agar tidak diblokir pemblokir popup di ponsel.
   window.location.href=url;
