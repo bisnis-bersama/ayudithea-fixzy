@@ -29,7 +29,7 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:point
 <input id="search" placeholder="Cari ID transaksi, pelanggan, WhatsApp, atau barang..." oninput="render();renderSales()">
 <select id="filterWork" onchange="render()"><option value="">Semua pengerjaan</option><option>Masuk</option><option>Menunggu Sparepart</option><option>Proses</option><option>Selesai</option><option>Sudah Diambil</option><option>Dibatalkan</option></select>
 <select id="filterPay" onchange="render();renderSales()"><option value="">Semua pembayaran</option><option>Lunas</option><option>Belum Lunas</option></select>
-<button class="primary" onclick="loadData()">↻ Muat Ulang</button><button class="dark" onclick="window.print()">Cetak</button>
+<button class="primary" onclick="activeTransactionView==='penjualan'?loadSales():loadData()">↻ Muat Ulang</button><button class="dark" onclick="window.print()">Cetak</button>
 </div>
 <div class="cards">
 <div class="card"><div class="label">TOTAL SERVIS</div><strong id="count">0</strong></div>
@@ -136,17 +136,31 @@ function numInput(v){const n=Number(v);return Number.isFinite(n)?n:0}
 function openRefund(id){const x=find(id);if(!x)return;if(norm(work(x))!=='dibatalkan'){notice('Pengembalian hanya tersedia untuk servis yang dibatalkan.',true);return}if(norm(refundStatus(x)).includes('sudah')||norm(refundStatus(x))==='dikembalikan'){notice('Pengembalian sudah tercatat.',true);return}$('refundId').value=id;$('refundAmount').value=paid(x);$('refundAmount').max=paid(x);$('refundNote').value='';$('refundInfo').textContent=`${val(x,'Nama Pelanggan')} • Uang diterima tercatat ${money(paid(x))}. Backend harus mencatat pengembalian secara penuh.`;$('refundModal').classList.add('show')}
 async function saveRefund(){const id=$('refundId').value,x=find(id),nominal=numInput($('refundAmount').value);if(!x)return;if(nominal!==paid(x)){notice('Nominal pengembalian harus sama dengan total uang yang tercatat diterima: '+money(paid(x)),true);return}if(!confirm('Pastikan uang benar-benar sudah dikembalikan kepada pelanggan. Simpan pencatatan pengembalian sekarang?'))return;try{const j=await post({action:'kembalikanDP',idServis:id,nominal,metode:$('refundMethod').value,catatan:$('refundNote').value});closeModal('refundModal');notice(j.message||'Pengembalian dicatat.');await loadData()}catch(e){notice('Pengembalian gagal: '+e.message,true)}}
 function whatsapp(id){const x=find(id);if(!x)return;const phone=String(val(x,'WhatsApp')).replace(/\D/g,'').replace(/^0/,'62');if(!phone){notice('Nomor WhatsApp tidak tersedia.',true);return}const msg=`Halo ${val(x,'Nama Pelanggan')||'Kak'}, informasi servis FIXZY:\nID Servis: ${val(x,'ID Servis')}\nHP: ${val(x,'Model HP')}\nStatus pengerjaan: ${work(x)}\nTotal tagihan: ${money(total(x))}\nSudah dibayar: ${money(paid(x))}\nSisa tagihan: ${money(remain(x))}\nTerima kasih.`;window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank','noopener')}
-function closeModal(id){$(id).classList.remove('show')}
-document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+function closeModal(id){
+ $(id).classList.remove('show');
+ if(id==='detailModal'){
+  const heading=document.querySelector('#detailModal .dialog-head h3');
+  if(heading)heading.textContent='Detail Servis & Aksi';
+  $('detailActions').innerHTML='';
+ }
+}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{
+ if(e.target===m){
+  m.classList.remove('show');
+  if(m.id==='detailModal'){
+   const heading=document.querySelector('#detailModal .dialog-head h3');
+   if(heading)heading.textContent='Detail Servis & Aksi';
+   $('detailActions').innerHTML='';
+  }
+ }
+}));
 let salesData=[],salesBusy=false,activeTransactionView='servis';
 function showTransactionView(which){activeTransactionView=which;const servicePanel=$('servicePanel'),salesPanel=$('salesPanel'),cards=document.querySelector('.cards'),filterWork=$('filterWork');const isSales=which==='penjualan';if(servicePanel)servicePanel.style.display=isSales?'none':'';if(salesPanel)salesPanel.style.display=isSales?'':'none';if(cards)cards.style.display=isSales?'none':'';if(filterWork)filterWork.style.display=isSales?'none':'';const title=document.querySelector('.brand h1 span');if(title)title.textContent=isSales?'| DATA PENJUALAN':'| DATA SERVIS';const subtitle=document.querySelector('.brand p');if(subtitle)subtitle.textContent=isSales?'Pengelolaan transaksi penjualan dan pembayaran':'Pengelolaan pengerjaan, pembayaran, dan pengembalian DP';const search=$('search');if(search)search.placeholder=isSales?'Cari ID penjualan, pelanggan, WhatsApp, atau barang...':'Cari ID servis, pelanggan, WhatsApp, atau model HP...';if(isSales)loadSales();else render();}
 function parseItems(row){let raw=val(row,'Items JSON','Barang JSON','Produk JSON','Detail JSON','Daftar Barang','Items','Detail Produk','Rincian Produk');if(!raw)return val(row,'Nama Produk','Produk','Keterangan')||'Penjualan barang';try{const a=Array.isArray(raw)?raw:JSON.parse(String(raw));if(Array.isArray(a))return a.map(i=>`${val(i,'namaProduk','Nama Produk','nama','produk','kodeProduk','kode')||'-'} × ${num(val(i,'qty','Qty','jumlah','Jumlah'))}`).join(', ')||'Penjualan barang'}catch(e){return String(raw)}return String(raw)}
-async function loadSales(){if(salesBusy)return;salesBusy=true;$('salesTbody').innerHTML='<tr><td colspan="9" class="loading">Memuat data penjualan...</td></tr>';try{const j=await get('penjualan');salesData=Array.isArray(j.data)?j.data:[];renderSales();}catch(e){$('salesTbody').innerHTML=`<tr><td colspan="9" class="empty">Gagal memuat penjualan: ${esc(e.message)}</td></tr>`;notice('Data servis tetap tersedia. Gagal memuat data penjualan: '+e.message,true)}finally{salesBusy=false}}
+async function loadSales(){if(salesBusy)return;salesBusy=true;$('salesTbody').innerHTML='<tr><td colspan="9" class="loading">Memuat data penjualan...</td></tr>';try{const j=await get('penjualan');salesData=Array.isArray(j.data)?j.data:(Array.isArray(j.penjualan)?j.penjualan:[]);renderSales();}catch(e){$('salesTbody').innerHTML=`<tr><td colspan="9" class="empty">Gagal memuat penjualan: ${esc(e.message)}</td></tr>`;notice('Data servis tetap tersedia. Gagal memuat data penjualan: '+e.message,true)}finally{salesBusy=false}}
 function renderSales(){const q=norm($('search').value);const fw=norm($('filterPay').value);const list=salesData.filter(x=>{const txt=norm([val(x,'ID Penjualan','ID','No. Transaksi'),val(x,'Nama Pelanggan','Pelanggan','Nama'),val(x,'WhatsApp','WA','Nomor WhatsApp'),parseItems(x)].join(' '));const rem=Math.max(0,num(val(x,'Sisa Piutang','Sisa Tagihan','Sisa Pembayaran','Sisa'))||total(x)-paid(x));const ps=norm(val(x,'Status Pembayaran','Status Bayar','Status')||(rem<=0?'Lunas':'Belum Lunas'));return(!q||txt.includes(q))&&(!fw||ps===fw)});if(!list.length){$('salesTbody').innerHTML='<tr><td colspan="9" class="empty">Belum ada data penjualan yang cocok.</td></tr>';return}$('salesTbody').innerHTML=list.map(x=>{const id=String(val(x,'ID Penjualan','ID','No. Transaksi')||'-');const t=total(x),p=paid(x),r=Math.max(0,num(val(x,'Sisa Piutang','Sisa Tagihan','Sisa Pembayaran','Sisa'))||t-p),ps=String(val(x,'Status Pembayaran','Status Bayar','Status')||(r<=0?'Lunas':'Belum Lunas'));return `<tr><td><b>${esc(id)}</b><div class="sub">${esc(dateText(val(x,'Tanggal','Tanggal Transaksi','TanggalTransaksi','Waktu','Timestamp')))}</div></td><td><b>${esc(val(x,'Nama Pelanggan','Pelanggan','Nama')||'-')}</b><div class="sub">${esc(val(x,'WhatsApp','WA','Nomor WhatsApp')||'No. WA tidak tersedia')}</div></td><td>${esc(parseItems(x))}</td><td><b>${money(t)}</b></td><td>${money(p)}</td><td>${money(r)}</td><td>${badgeForSales(ps)}</td><td>${esc(val(x,'Status Transaksi','Status Penjualan')||ps)}</td><td><button class="small primary" onclick="detailSale('${esc(id)}')">Detail</button></td></tr>`}).join('')}
 function badgeForSales(s){const kind=norm(s)==='lunas'?'green':'yellow';return `<span class="badge b-${kind}">${esc(s)}</span>`}
 function detailSale(id){const x=salesData.find(r=>String(val(r,'ID Penjualan','ID','No. Transaksi')||'-')===String(id));if(!x)return;const entries=Object.entries(x).filter(([k,v])=>v!==''&&v!==null&&v!==undefined);$('detailBody').innerHTML='<div class="detail-grid">'+entries.map(([k,v])=>`<b>${esc(k)}</b><span>${esc(typeof v==='object'?JSON.stringify(v):v)}</span>`).join('')+'</div>';document.querySelector('#detailModal .dialog-head h3').textContent='Detail Penjualan';$('detailActions').innerHTML='';$('detailModal').classList.add('show')}
-const originalCloseModal=closeModal;function closeModal(id){originalCloseModal(id);if(id==='detailModal')document.querySelector('#detailModal .dialog-head h3').textContent='Detail Servis & Aksi'}
-const originalLoadData=loadData;
 loadData();
 </script>
 </body>
