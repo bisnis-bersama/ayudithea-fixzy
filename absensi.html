@@ -30,13 +30,57 @@ const monthISO=()=>todayISO().slice(0,7);
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function showMsg(text,type='info'){const el=$('pesan');el.textContent=text;el.className='status show '+type}
 function hideMsg(){$('pesan').className='status'}
-async function apiGet(action,params={}){const u=new URL(API_URL);u.searchParams.set('action',action);Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));const r=await fetch(u.toString(),{method:'GET'});if(!r.ok)throw Error('Server merespons HTTP '+r.status);const j=await r.json();if(j.ok===false)throw Error(j.message||'Permintaan gagal');return j}
-async function apiPost(data){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});if(!r.ok)throw Error('Server merespons HTTP '+r.status);const j=await r.json();if(!j.ok)throw Error(j.message||'Gagal menyimpan');return j}
+async function fetchWithTimeout(url,options={},timeoutMs=15000){
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),timeoutMs);
+ try{return await fetch(url,{...options,signal:controller.signal})}
+ catch(e){if(e.name==='AbortError')throw Error('Server tidak merespons dalam 15 detik. Periksa deployment Apps Script dan coba Muat Ulang.');throw e}
+ finally{clearTimeout(timer)}
+}
+async function apiGet(action,params={}){const u=new URL(API_URL);u.searchParams.set('action',action);Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));const r=await fetchWithTimeout(u.toString(),{method:'GET'});if(!r.ok)throw Error('Server merespons HTTP '+r.status);const j=await r.json();if(j.ok===false)throw Error(j.message||'Permintaan gagal');return j}
+async function apiPost(data){const r=await fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)},20000);if(!r.ok)throw Error('Server merespons HTTP '+r.status);const j=await r.json();if(!j.ok)throw Error(j.message||'Gagal menyimpan');return j}
 function dateValue(v){if(!v)return '';if(v instanceof Date)return v.toISOString().slice(0,10);let s=String(v);if(s.includes('T'))s=s.slice(0,10);return s.slice(0,10)}
-async function init(){ $('tanggal').value=todayISO();$('bulan').value=monthISO();$('tanggalLabel').textContent=todayISO();bind();await loadEmployees();await loadAttendance();}
+async function init(){ $('tanggal').value=todayISO();$('bulan').value=monthISO();$('tanggalLabel').textContent=todayISO();bind();await loadEmployees();renderTable();await loadAttendance();}
 function bind(){ $('btnMuat').onclick=loadAttendance;$('btnRefresh').onclick=async()=>{await loadEmployees();await loadAttendance()};$('btnSimpan').onclick=saveAll;$('btnSemuaHadir').onclick=()=>setAll('Hadir');$('btnSemuaLibur').onclick=()=>setAll('Libur');$('tanggal').onchange=loadAttendance;$('filterStatus').onchange=renderTable;$('cariNama').oninput=renderTable;$('btnRekap').onclick=loadMonthlySummary; }
 async function loadEmployees(){try{const j=await apiGet('karyawan');employees=(j.data||[]).filter(e=>String(e.Status||'Aktif').toLowerCase()!=='nonaktif'&&String(e.Status||'Aktif').toLowerCase()!=='tidak aktif');employees.sort((a,b)=>String(a.Nama||'').localeCompare(String(b.Nama||''),'id'));$('mAktif').textContent=employees.length;}catch(e){showMsg('Gagal memuat karyawan: '+e.message,'err');$('tbody').innerHTML=`<tr><td colspan="9" class="empty">${esc(e.message)}</td></tr>`}}
-async function loadAttendance(){hideMsg();const date=$('tanggal').value||todayISO();$('tanggalLabel').textContent=date; $('tbody').innerHTML='<tr><td colspan="9" class="empty">Memuat absensi...</td></tr>';try{const month=date.slice(0,7);const j=await apiGet('absensi',{bulan:month});attendance=(j.data||[]).filter(a=>dateValue(a.Tanggal)===date);draft={};attendance.forEach(a=>{draft[String(a['Karyawan ID'])]={status:a.Status||'Hadir',jamMasuk:a['Jam Masuk']||'',jamPulang:a['Jam Pulang']||'',catatan:a.Catatan||'',saved:true}});employees.forEach(e=>{const id=String(e.ID);if(!draft[id])draft[id]={status:'',jamMasuk:'',jamPulang:'',catatan:'',saved:false}});renderTable();updateMetrics();}catch(e){$('tbody').innerHTML=`<tr><td colspan="9" class="empty">Tidak dapat memuat absensi: ${esc(e.message)}</td></tr>`;showMsg('Gagal memuat absensi. Periksa URL Apps Script dan izin Web App. '+e.message,'err')}}
+async function loadAttendance(){
+ hideMsg();
+ const date=$('tanggal').value||todayISO();
+ $('tanggalLabel').textContent=date;
+ $('tbody').innerHTML='<tr><td colspan="9" class="empty">Memuat data absensi...</td></tr>';
+ // Tampilkan karyawan terlebih dahulu agar tabel tidak kosong ketika API absensi lambat.
+ draft={};
+ employees.forEach(e=>{draft[String(e.ID)]={status:'',jamMasuk:'',jamPulang:'',catatan:'',saved:false}});
+ renderTable();
+ try{
+   const j=await apiGet('absensi',{bulan:date.slice(0,7)});
+   attendance=(j.data||[]).filter(a=>dateValue(a.Tanggal)===date);
+   attendance.forEach(a=>{
+     draft[String(a['Karyawan ID'])]={
+       status:a.Status||'',
+       jamMasuk:normalizeTime(a['Jam Masuk']),
+       jamPulang:normalizeTime(a['Jam Pulang']),
+       catatan:a.Catatan||'',
+       saved:true
+     };
+   });
+   employees.forEach(e=>{
+     const id=String(e.ID);
+     if(!draft[id])draft[id]={status:'',jamMasuk:'',jamPulang:'',catatan:'',saved:false};
+   });
+   renderTable();updateMetrics();
+ }catch(e){
+   renderTable();updateMetrics();
+   showMsg('Nama karyawan sudah dimuat, tetapi data absensi gagal dimuat: '+e.message+' Anda masih bisa mengisi absensi baru. Periksa deployment Apps Script lalu tekan Muat Ulang.','err');
+ }
+}
+function normalizeTime(v){
+ if(v===null||v===undefined||v==='')return '';
+ if(v instanceof Date)return String(v.getHours()).padStart(2,'0')+':'+String(v.getMinutes()).padStart(2,'0');
+ const s=String(v).trim();
+ const m=s.match(/(\d{1,2}):(\d{2})/);
+ return m?String(m[1]).padStart(2,'0')+':'+m[2]:'';
+}
 function durationHours(start,end){if(!start||!end)return 0;const a=start.split(':').map(Number),b=end.split(':').map(Number);if(a.length<2||b.length<2||!Number.isFinite(a[0])||!Number.isFinite(b[0]))return 0;let mins=(b[0]*60+b[1])-(a[0]*60+a[1]);if(mins<0)mins+=1440;return Math.max(0,mins/60)}
 function workInfo(d,e){const hours=durationHours(d.jamMasuk,d.jamPulang),standard=durationHours(JAM_MASUK_STANDAR,JAM_PULANG_STANDAR),ratio=Math.min(1,hours/standard),wage=Number(e['Upah Harian']||0)*ratio;return {hours,ratio,wage,standard}}
 function rupiah(n){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n||0)}
