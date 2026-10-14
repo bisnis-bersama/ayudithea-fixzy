@@ -168,8 +168,26 @@ function detailSale(id){
  const phone=String(val(x,'WhatsApp','WA','Nomor WhatsApp')||'').replace(/\D/g,'').replace(/^0/,'62');
  const buttons=[];
  if(phone){const name=val(x,'Nama Pelanggan','Pelanggan','Nama')||'Kak';const sid=val(x,'ID Penjualan','ID','No. Transaksi')||id;const msg=`Halo ${name}, informasi transaksi penjualan FIXZY:\nID Penjualan: ${sid}\nRincian barang: ${parseItems(x)}\nTotal: ${money(total(x))}\nDibayar: ${money(paid(x))}\nSisa tagihan: ${money(Math.max(0,num(val(x,'Sisa Piutang','Sisa Tagihan','Sisa Pembayaran','Sisa'))||total(x)-paid(x)))}\nTerima kasih.`;buttons.push(`<button class="dark" onclick="window.open('https://wa.me/${phone}?text='+encodeURIComponent(${JSON.stringify(msg)}),'_blank','noopener')">WhatsApp</button>`)}
+ buttons.push(`<button class="primary" onclick="changeSalePaymentStatus(${JSON.stringify(String(val(x,'ID Penjualan','ID','No. Transaksi')||id))})">Ubah Status Pembayaran</button>`);
+ buttons.push(`<button class="dark" onclick="changeSaleStatus(${JSON.stringify(String(val(x,'ID Penjualan','ID','No. Transaksi')||id))})">Ubah Status Penjualan</button>`);
  buttons.push('<button class="light" onclick="closeModal(\'detailModal\')">Tutup</button>');
  $('detailActions').innerHTML=buttons.join('');$('detailModal').classList.add('show');
+}
+async function changeSalePaymentStatus(id){
+ const x=salesData.find(r=>String(val(r,'ID Penjualan','ID','No. Transaksi')||'-')===String(id));if(!x)return;
+ const current=String(val(x,'Status Pembayaran','Status Bayar')|| (paid(x)>=total(x)?'Lunas':'Belum Lunas'));
+ const choice=prompt('Ubah status pembayaran penjualan '+id+'.\nKetik: Lunas atau Belum Lunas',current);if(choice===null)return;
+ const status=choice.trim();if(!['lunas','belum lunas'].includes(norm(status))){notice('Status harus Lunas atau Belum Lunas.',true);return;}
+ if(!confirm('Simpan status pembayaran menjadi '+(norm(status)==='lunas'?'Lunas':'Belum Lunas')+'?'))return;
+ try{const j=await post({action:'ubahstatuspenjualan',idPenjualan:id,id:id,statusPembayaran:norm(status)==='lunas'?'Lunas':'Belum Lunas'});notice(j.message||'Status pembayaran berhasil diperbarui.');closeModal('detailModal');await loadSales();}catch(e){notice('Gagal mengubah status pembayaran. Backend harus mendukung action ubahstatuspenjualan: '+e.message,true)}
+}
+async function changeSaleStatus(id){
+ const x=salesData.find(r=>String(val(r,'ID Penjualan','ID','No. Transaksi')||'-')===String(id));if(!x)return;
+ const current=String(val(x,'Status Transaksi','Status Penjualan')||'Belum Lunas');
+ const choice=prompt('Ubah status transaksi penjualan '+id+'.\nMasukkan status baru:',current);if(choice===null)return;
+ const status=choice.trim();if(!status){notice('Status tidak boleh kosong.',true);return;}
+ if(!confirm('Simpan status transaksi menjadi "'+status+'"?'))return;
+ try{const j=await post({action:'ubahstatuspenjualan',idPenjualan:id,id:id,statusPenjualan:status,statusTransaksi:status});notice(j.message||'Status penjualan berhasil diperbarui.');closeModal('detailModal');await loadSales();}catch(e){notice('Gagal mengubah status penjualan. Backend harus mendukung action ubahstatuspenjualan: '+e.message,true)}
 }
 loadData();
 </script>
